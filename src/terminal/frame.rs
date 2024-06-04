@@ -77,36 +77,6 @@ impl Frame<'_> {
         widget.render_ref(area, self.buffer);
     }
 
-    /// Render a [`StatefulWidget`] to the current buffer using [`StatefulWidget::render`].
-    ///
-    /// Usually the area argument is the size of the current frame or a sub-area of the current
-    /// frame (which can be obtained using [`Layout`] to split the total area).
-    ///
-    /// The last argument should be an instance of the [`StatefulWidget::State`] associated to the
-    /// given [`StatefulWidget`].
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::*};
-    /// # let backend = TestBackend::new(5, 5);
-    /// # let mut terminal = Terminal::new(backend).unwrap();
-    /// # let mut frame = terminal.get_frame();
-    /// let mut state = ListState::default().with_selected(Some(1));
-    /// let list = List::new(vec![ListItem::new("Item 1"), ListItem::new("Item 2")]);
-    /// let area = Rect::new(0, 0, 5, 5);
-    /// frame.render_stateful_widget(list, area, &mut state);
-    /// ```
-    ///
-    /// [`Layout`]: crate::layout::Layout
-    #[deprecated(since = "0.0.0", note = "NO_WIDGET_EXPERIMENT")]
-    pub fn render_stateful_widget<W>(&mut self, widget: W, area: Rect, state: &mut W::State)
-    where
-        W: StatefulWidget,
-    {
-        widget.render(area, self.buffer, state);
-    }
-
     /// Render a [`StatefulWidgetRef`] to the current buffer using
     /// [`StatefulWidgetRef::render_ref`].
     ///
