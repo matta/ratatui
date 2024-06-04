@@ -3,7 +3,7 @@ use ratatui::{
     buffer::Buffer,
     style::{Color, Style},
     text::Span,
-    widgets::{canvas::Canvas, Widget},
+    widgets::canvas::Canvas,
     Terminal,
 };
 

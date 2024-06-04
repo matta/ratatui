@@ -130,12 +130,12 @@ impl App {
         let [map, right] = horizontal.areas(frame.size());
         let [pong, boxes] = vertical.areas(right);
 
-        self.map_canvas().render(map, frame.buffer_mut());
-        self.pong_canvas().render(pong, frame.buffer_mut());
-        self.boxes_canvas(boxes).render(boxes, frame.buffer_mut());
+        self.render_map_canvas(map, frame.buffer_mut());
+        self.render_pong_canvas(pong, frame.buffer_mut());
+        self.render_boxes_canvas(boxes, frame.buffer_mut());
     }
 
-    fn map_canvas(&self) -> impl Widget + '_ {
+    fn render_map_canvas(&self, area: Rect, buf: &mut Buffer) {
         Canvas::default()
             .block(Block::bordered().title("World"))
             .marker(self.marker)
@@ -148,9 +148,10 @@ impl App {
             })
             .x_bounds([-180.0, 180.0])
             .y_bounds([-90.0, 90.0])
+            .render(area, buf);
     }
 
-    fn pong_canvas(&self) -> impl Widget + '_ {
+    fn render_pong_canvas(&self, area: Rect, buf: &mut Buffer) {
         Canvas::default()
             .block(Block::bordered().title("Pong"))
             .marker(self.marker)
@@ -159,9 +160,10 @@ impl App {
             })
             .x_bounds([10.0, 210.0])
             .y_bounds([10.0, 110.0])
+            .render(area, buf);
     }
 
-    fn boxes_canvas(&self, area: Rect) -> impl Widget {
+    fn render_boxes_canvas(&self, area: Rect, buf: &mut Buffer) {
         let left = 0.0;
         let right = f64::from(area.width);
         let bottom = 0.0;
@@ -197,6 +199,7 @@ impl App {
                     }
                 }
             })
+            .render(area, buf);
     }
 }
 

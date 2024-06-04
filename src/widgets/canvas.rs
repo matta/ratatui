@@ -721,22 +721,9 @@ where
         self.marker = marker;
         self
     }
-}
 
-impl<F> Widget for Canvas<'_, F>
-where
-    F: Fn(&mut Context),
-{
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl<F> WidgetRef for Canvas<'_, F>
-where
-    F: Fn(&mut Context),
-{
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// FIXME: write me
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         if let Some(ref block) = self.block {
             block.render(area, buf);
         }
