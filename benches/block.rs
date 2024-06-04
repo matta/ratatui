@@ -4,7 +4,7 @@ use ratatui::{
     layout::{Alignment, Rect},
     widgets::{
         block::{Position, Title},
-        Block, Padding, Widget,
+        Block, Padding,
     },
 };
 

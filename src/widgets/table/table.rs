@@ -573,7 +573,7 @@ impl<'a> Table<'a> {
     pub fn render(&self, area: Rect, buf: &mut Buffer, state: &mut TableState) {
         buf.set_style(area, self.style);
         if let Some(ref block) = self.block {
-            block.render_ref(area, buf);
+            block.render(area, buf);
         }
         let table_area = self.block.inner_if_some(area);
         if table_area.is_empty() {

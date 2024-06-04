@@ -511,7 +511,7 @@ impl SpacerBlock {
     const BORDER_COLOR: Color = SLATE.c600;
 
     /// A block with a corner borders
-    fn block() -> impl Widget {
+    fn block() -> Block<'static> {
         let corners_only = symbols::border::Set {
             top_left: line::NORMAL.top_left,
             top_right: line::NORMAL.top_right,

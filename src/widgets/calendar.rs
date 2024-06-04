@@ -128,7 +128,7 @@ impl<DS: DateStyler> Widget for Monthly<'_, DS> {
 impl<DS: DateStyler> WidgetRef for Monthly<'_, DS> {
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
         if let Some(ref block) = self.block {
-            block.render_ref(area, buf);
+            block.render(area, buf);
         }
         let inner = self.block.inner_if_some(area);
         self.render_monthly(inner, buf);

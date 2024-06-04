@@ -6,7 +6,7 @@ use ratatui::{
     text::Span,
     widgets::{
         block::title::{Position, Title},
-        Block, Borders, Widget,
+        Block, Borders,
     },
     Terminal,
 };
@@ -42,7 +42,7 @@ fn widgets_block_renders() {
 #[test]
 fn widgets_block_titles_overlap() {
     #[track_caller]
-    fn test_case<'line, Lines>(block: Block, area: Rect, expected: Lines)
+    fn test_case<'line, Lines>(block: &Block, area: Rect, expected: Lines)
     where
         Lines: IntoIterator,
         Lines::Item: Into<ratatui::text::Line<'line>>,
@@ -57,7 +57,7 @@ fn widgets_block_titles_overlap() {
 
     // Left overrides the center
     test_case(
-        Block::new()
+        &Block::new()
             .title(Title::from("aaaaa").alignment(Alignment::Left))
             .title(Title::from("bbb").alignment(Alignment::Center))
             .title(Title::from("ccc").alignment(Alignment::Right)),
@@ -67,7 +67,7 @@ fn widgets_block_titles_overlap() {
 
     // Left alignment overrides the center alignment which overrides the right alignment
     test_case(
-        Block::new()
+        &Block::new()
             .title(Title::from("aaaaa").alignment(Alignment::Left))
             .title(Title::from("bbbbb").alignment(Alignment::Center))
             .title(Title::from("ccccc").alignment(Alignment::Right)),
@@ -77,7 +77,7 @@ fn widgets_block_titles_overlap() {
 
     // Multiple left alignment overrides the center alignment and the right alignment
     test_case(
-        Block::new()
+        &Block::new()
             .title(Title::from("aaaaa").alignment(Alignment::Left))
             .title(Title::from("aaaaa").alignment(Alignment::Left))
             .title(Title::from("bbbbb").alignment(Alignment::Center))
@@ -88,7 +88,7 @@ fn widgets_block_titles_overlap() {
 
     // The right alignment doesn't override the center alignment, but pierces through it
     test_case(
-        Block::new()
+        &Block::new()
             .title(Title::from("bbbbb").alignment(Alignment::Center))
             .title(Title::from("ccccccccccc").alignment(Alignment::Right)),
         Rect::new(0, 0, 11, 1),
@@ -99,7 +99,7 @@ fn widgets_block_titles_overlap() {
 #[test]
 fn widgets_block_renders_on_small_areas() {
     #[track_caller]
-    fn test_case(block: Block, area: Rect, expected: &Buffer) {
+    fn test_case(block: &Block, area: Rect, expected: &Buffer) {
         let backend = TestBackend::new(area.width, area.height);
         let mut terminal = Terminal::new(backend).unwrap();
         terminal
@@ -118,67 +118,67 @@ fn widgets_block_renders_on_small_areas() {
     ];
     for (borders, symbol) in one_cell_test_cases {
         test_case(
-            Block::new().borders(borders).title("Test"),
+            &Block::new().borders(borders).title("Test"),
             Rect::new(0, 0, 0, 0),
             &Buffer::empty(Rect::new(0, 0, 0, 0)),
         );
         test_case(
-            Block::new().borders(borders).title("Test"),
+            &Block::new().borders(borders).title("Test"),
             Rect::new(0, 0, 1, 0),
             &Buffer::empty(Rect::new(0, 0, 1, 0)),
         );
         test_case(
-            Block::new().borders(borders).title("Test"),
+            &Block::new().borders(borders).title("Test"),
             Rect::new(0, 0, 0, 1),
             &Buffer::empty(Rect::new(0, 0, 0, 1)),
         );
         test_case(
-            Block::new().borders(borders).title("Test"),
+            &Block::new().borders(borders).title("Test"),
             Rect::new(0, 0, 1, 1),
             &Buffer::with_lines([symbol]),
         );
     }
     test_case(
-        Block::new().borders(Borders::LEFT).title("Test"),
+        &Block::new().borders(Borders::LEFT).title("Test"),
         Rect::new(0, 0, 4, 1),
         &Buffer::with_lines(["│Tes"]),
     );
     test_case(
-        Block::new().borders(Borders::RIGHT).title("Test"),
+        &Block::new().borders(Borders::RIGHT).title("Test"),
         Rect::new(0, 0, 4, 1),
         &Buffer::with_lines(["Tes│"]),
     );
     test_case(
-        Block::new().borders(Borders::RIGHT).title("Test"),
+        &Block::new().borders(Borders::RIGHT).title("Test"),
         Rect::new(0, 0, 4, 1),
         &Buffer::with_lines(["Tes│"]),
     );
     test_case(
-        Block::new()
+        &Block::new()
             .borders(Borders::LEFT | Borders::RIGHT)
             .title("Test"),
         Rect::new(0, 0, 4, 1),
         &Buffer::with_lines(["│Te│"]),
     );
     test_case(
-        Block::new().borders(Borders::TOP).title("Test"),
+        &Block::new().borders(Borders::TOP).title("Test"),
         Rect::new(0, 0, 4, 1),
         &Buffer::with_lines(["Test"]),
     );
     test_case(
-        Block::new().borders(Borders::TOP).title("Test"),
+        &Block::new().borders(Borders::TOP).title("Test"),
         Rect::new(0, 0, 5, 1),
         &Buffer::with_lines(["Test─"]),
     );
     test_case(
-        Block::new()
+        &Block::new()
             .borders(Borders::LEFT | Borders::TOP)
             .title("Test"),
         Rect::new(0, 0, 5, 1),
         &Buffer::with_lines(["┌Test"]),
     );
     test_case(
-        Block::new()
+        &Block::new()
             .borders(Borders::LEFT | Borders::TOP)
             .title("Test"),
         Rect::new(0, 0, 6, 1),

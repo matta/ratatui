@@ -948,7 +948,7 @@ impl WidgetRef for Chart<'_> {
         buf.set_style(area, self.style);
 
         if let Some(ref block) = self.block {
-            block.render_ref(area, buf);
+            block.render(area, buf);
         }
         let chart_area = self.block.inner_if_some(area);
         let Some(layout) = self.layout(chart_area) else {
