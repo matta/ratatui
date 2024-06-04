@@ -4,7 +4,7 @@ use criterion::{
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
-    widgets::{Paragraph, Widget, Wrap},
+    widgets::{Paragraph, Wrap},
 };
 
 /// because the scroll offset is a u16, the maximum number of lines that can be scrolled is 65535.

@@ -26,6 +26,7 @@ pub struct Clear;
 
 impl Clear {
     /// FIXME: document me
+    #[allow(clippy::unused_self)]
     pub fn render(&self, area: Rect, buf: &mut Buffer) {
         for x in area.left()..area.right() {
             for y in area.top()..area.bottom() {

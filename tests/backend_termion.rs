@@ -1,7 +1,6 @@
 #[cfg(feature = "termion")]
 #[test]
 fn backend_termion_should_only_write_diffs() -> Result<(), Box<dyn std::error::Error>> {
-    use ratatui::widgets::Widget;
     use std::{fmt::Write, io::Cursor};
 
     let mut bytes = Vec::new();

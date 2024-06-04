@@ -3,14 +3,14 @@ use ratatui::{
     buffer::Buffer,
     layout::Alignment,
     text::{Line, Span, Text},
-    widgets::{Block, Padding, Paragraph, Widget, Wrap},
+    widgets::{Block, Padding, Paragraph, Wrap},
     Terminal,
 };
 
 /// Tests the [`Paragraph`] widget against the expected [`Buffer`] by rendering it onto an equal
 /// area and comparing the rendered and expected content.
 #[track_caller]
-fn test_case(paragraph: Paragraph, expected: &Buffer) {
+fn test_case(paragraph: &Paragraph, expected: &Buffer) {
     let backend = TestBackend::new(expected.area.width, expected.area.height);
     let mut terminal = Terminal::new(backend).unwrap();
     terminal
@@ -31,7 +31,7 @@ fn widgets_paragraph_renders_double_width_graphemes() {
         .wrap(Wrap { trim: true });
 
     test_case(
-        paragraph,
+        &paragraph,
         &Buffer::with_lines([
             "┌────────┐",
             "│コンピュ│",
@@ -82,7 +82,7 @@ fn widgets_paragraph_can_wrap_with_a_trailing_nbsp() {
     let paragraph = Paragraph::new(line).block(Block::bordered());
 
     test_case(
-        paragraph,
+        &paragraph,
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│NBSP\u{00a0}             │",
@@ -98,7 +98,7 @@ fn widgets_paragraph_can_scroll_horizontally() {
     let paragraph = Paragraph::new(text).block(Block::bordered());
 
     test_case(
-        paragraph.clone().alignment(Alignment::Left).scroll((0, 7)),
+        &paragraph.clone().alignment(Alignment::Left).scroll((0, 7)),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│在可以水平滚动了！│",
@@ -114,7 +114,7 @@ fn widgets_paragraph_can_scroll_horizontally() {
     );
     // only support Alignment::Left
     test_case(
-        paragraph.clone().alignment(Alignment::Right).scroll((0, 7)),
+        &paragraph.clone().alignment(Alignment::Right).scroll((0, 7)),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│段落现在可以水平滚│",
@@ -143,7 +143,7 @@ fn widgets_paragraph_can_wrap_its_content() {
         .wrap(Wrap { trim: true });
 
     test_case(
-        paragraph.clone().alignment(Alignment::Left),
+        &paragraph.clone().alignment(Alignment::Left),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│The library is    │",
@@ -158,7 +158,7 @@ fn widgets_paragraph_can_wrap_its_content() {
         ]),
     );
     test_case(
-        paragraph.clone().alignment(Alignment::Center),
+        &paragraph.clone().alignment(Alignment::Center),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│  The library is  │",
@@ -173,7 +173,7 @@ fn widgets_paragraph_can_wrap_its_content() {
         ]),
     );
     test_case(
-        paragraph.clone().alignment(Alignment::Right),
+        &paragraph.clone().alignment(Alignment::Right),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│    The library is│",
@@ -202,7 +202,7 @@ fn widgets_paragraph_works_with_padding() {
         .wrap(Wrap { trim: true });
 
     test_case(
-        paragraph.clone().alignment(Alignment::Left),
+        &paragraph.clone().alignment(Alignment::Left),
         &Buffer::with_lines([
             "┌────────────────────┐",
             "│                    │",
@@ -219,7 +219,7 @@ fn widgets_paragraph_works_with_padding() {
         ]),
     );
     test_case(
-        paragraph.clone().alignment(Alignment::Right),
+        &paragraph.clone().alignment(Alignment::Right),
         &Buffer::with_lines([
             "┌────────────────────┐",
             "│                    │",
@@ -244,7 +244,7 @@ fn widgets_paragraph_works_with_padding() {
     .wrap(Wrap { trim: true });
 
     test_case(
-        paragraph.alignment(Alignment::Right),
+        &paragraph.alignment(Alignment::Right),
         &Buffer::with_lines([
             "┌────────────────────┐",
             "│                    │",
@@ -278,7 +278,7 @@ fn widgets_paragraph_can_align_spans() {
         .wrap(Wrap { trim: true });
 
     test_case(
-        paragraph.clone().alignment(Alignment::Left),
+        &paragraph.clone().alignment(Alignment::Left),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│  This string will│",
@@ -293,7 +293,7 @@ fn widgets_paragraph_can_align_spans() {
         ]),
     );
     test_case(
-        paragraph.alignment(Alignment::Center),
+        &paragraph.alignment(Alignment::Center),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│  This string will│",
@@ -327,7 +327,7 @@ fn widgets_paragraph_can_align_spans() {
     let paragraph = Paragraph::new(text).block(Block::bordered());
 
     test_case(
-        paragraph.clone().alignment(Alignment::Right),
+        &paragraph.clone().alignment(Alignment::Right),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│This string       │",
@@ -342,7 +342,7 @@ fn widgets_paragraph_can_align_spans() {
         ]),
     );
     test_case(
-        paragraph.alignment(Alignment::Left),
+        &paragraph.alignment(Alignment::Left),
         &Buffer::with_lines([
             "┌──────────────────┐",
             "│This string       │",

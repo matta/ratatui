@@ -285,7 +285,7 @@ impl App {
         text.bold().fg(Self::HEADER_COLOR).into_centered_line()
     }
 
-    fn instructions() -> impl Widget {
+    fn instructions() -> Paragraph<'static> {
         let text = "◄ ►: select, ▲ ▼: edit, 1-6: swap, a: add, x: delete, q: quit, + -: spacing";
         Paragraph::new(text)
             .fg(Self::TEXT_COLOR)
@@ -293,7 +293,7 @@ impl App {
             .wrap(Wrap { trim: false })
     }
 
-    fn swap_legend() -> impl Widget {
+    fn swap_legend() -> Paragraph<'static> {
         #[allow(unstable_name_collisions)]
         Paragraph::new(
             Line::from(
@@ -323,7 +323,7 @@ impl App {
     /// A bar like `<----- 80 px (gap: 2 px) ----->`
     ///
     /// Only shows the gap when spacing is not zero
-    fn axis(&self, width: u16) -> impl Widget {
+    fn axis(&self, width: u16) -> Paragraph<'static> {
         let label = if self.spacing != 0 {
             format!("{} px (gap: {} px)", width, self.spacing)
         } else {
@@ -528,7 +528,7 @@ impl SpacerBlock {
     }
 
     /// A vertical line used if there is not enough space to render the block
-    fn line() -> impl Widget {
+    fn line() -> Paragraph<'static> {
         Paragraph::new(Text::from(vec![
             Line::from(""),
             Line::from("│"),

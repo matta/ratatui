@@ -3,7 +3,7 @@ use std::error::Error;
 use ratatui::{
     backend::{Backend, TestBackend},
     layout::Rect,
-    widgets::{Paragraph, Widget},
+    widgets::Paragraph,
     Terminal, TerminalOptions, Viewport,
 };
 

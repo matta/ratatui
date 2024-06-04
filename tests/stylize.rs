@@ -5,7 +5,7 @@ use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::{Color, Style, Stylize},
-    widgets::{BarChart, Block, Paragraph, Widget},
+    widgets::{BarChart, Block, Paragraph},
     Terminal,
 };
 

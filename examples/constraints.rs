@@ -389,7 +389,7 @@ impl Widget for Example {
 }
 
 impl Example {
-    fn illustration(constraint: Constraint, width: u16) -> impl Widget {
+    fn illustration(constraint: Constraint, width: u16) -> Paragraph<'static> {
         let color = match constraint {
             Constraint::Length(_) => LENGTH_COLOR,
             Constraint::Percentage(_) => PERCENTAGE_COLOR,

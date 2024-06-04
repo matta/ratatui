@@ -284,7 +284,7 @@ impl App {
     }
 
     /// a bar like `<----- 80 px (gap: 2 px)? ----->`
-    fn axis(width: u16, spacing: u16) -> impl Widget {
+    fn axis(width: u16, spacing: u16) -> Paragraph<'static> {
         let width = width as usize;
         // only show gap when spacing is not zero
         let label = if spacing != 0 {
@@ -491,7 +491,7 @@ impl Example {
             .render(spacer, buf);
     }
 
-    fn illustration(constraint: Constraint, width: u16) -> impl Widget {
+    fn illustration(constraint: Constraint, width: u16) -> Paragraph<'static> {
         let main_color = color_for_constraint(constraint);
         let fg_color = Color::White;
         let title = format!("{constraint}");
