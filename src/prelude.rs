@@ -32,5 +32,5 @@ pub use crate::{
     symbols::{self, Marker},
     terminal::{CompletedFrame, Frame, Terminal, TerminalOptions, Viewport},
     text::{self, Line, Masked, Span, Text},
-    widgets::{block::BlockExt, StatefulWidget, Widget},
+    widgets::{block::BlockExt, Widget},
 };
