@@ -165,7 +165,7 @@ fn ui(frame: &mut Frame, app: &App) {
         .bar_style(Style::default().fg(Color::Yellow))
         .value_style(Style::default().fg(Color::Black).bg(Color::Yellow));
 
-    frame.render_widget(barchart, top);
+    barchart.render(top, frame.buffer_mut());
     draw_bar_with_group_labels(frame, app, left);
     draw_horizontal_bars(frame, app, right);
 }
@@ -225,7 +225,7 @@ fn draw_bar_with_group_labels(f: &mut Frame, app: &App, area: Rect) {
         barchart = barchart.data(group);
     }
 
-    f.render_widget(barchart, area);
+    barchart.render(area, f.buffer_mut());
 
     if area.height >= LEGEND_HEIGHT && area.width >= TOTAL_REVENUE.len() as u16 + 2 {
         let legend_width = TOTAL_REVENUE.len() as u16 + 2;
@@ -256,7 +256,7 @@ fn draw_horizontal_bars(f: &mut Frame, app: &App, area: Rect) {
         barchart = barchart.data(group);
     }
 
-    f.render_widget(barchart, area);
+    barchart.render(area, f.buffer_mut());
 
     if area.height >= LEGEND_HEIGHT && area.width >= TOTAL_REVENUE.len() as u16 + 2 {
         let legend_width = TOTAL_REVENUE.len() as u16 + 2;
@@ -294,5 +294,5 @@ fn draw_legend(f: &mut Frame, area: Rect) {
 
     let block = Block::bordered().style(Style::default().fg(Color::White));
     let paragraph = Paragraph::new(text).block(block);
-    f.render_widget(paragraph, area);
+    paragraph.render(area, f.buffer_mut());
 }

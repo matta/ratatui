@@ -130,9 +130,9 @@ impl App {
         let [map, right] = horizontal.areas(frame.size());
         let [pong, boxes] = vertical.areas(right);
 
-        frame.render_widget(self.map_canvas(), map);
-        frame.render_widget(self.pong_canvas(), pong);
-        frame.render_widget(self.boxes_canvas(boxes), boxes);
+        self.map_canvas().render(map, frame.buffer_mut());
+        self.pong_canvas().render(pong, frame.buffer_mut());
+        self.boxes_canvas(boxes).render(boxes, frame.buffer_mut());
     }
 
     fn map_canvas(&self) -> impl Widget + '_ {

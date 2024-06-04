@@ -118,7 +118,7 @@ impl App {
     }
 
     fn draw(&self, terminal: &mut Terminal<impl Backend>) -> io::Result<()> {
-        terminal.draw(|frame| frame.render_widget(self, frame.size()))?;
+        terminal.draw(|frame| self.render(frame.size(), frame.buffer_mut()))?;
         Ok(())
     }
 

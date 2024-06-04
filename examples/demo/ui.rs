@@ -17,7 +17,7 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         .block(Block::bordered().title(app.title))
         .highlight_style(Style::default().fg(Color::Yellow))
         .select(app.tabs.index);
-    f.render_widget(tabs, chunks[0]);
+    tabs.render(chunks[0], f.buffer_mut());
     match app.tabs.index {
         0 => draw_first_tab(f, app, chunks[1]),
         1 => draw_second_tab(f, app, chunks[1]),
@@ -47,7 +47,7 @@ fn draw_gauges(f: &mut Frame, app: &mut App, area: Rect) {
     .margin(1)
     .split(area);
     let block = Block::bordered().title("Graphs");
-    f.render_widget(block, area);
+    block.render(area, f.buffer_mut());
 
     let label = format!("{:.2}%", app.progress * 100.0);
     let gauge = Gauge::default()
@@ -61,7 +61,7 @@ fn draw_gauges(f: &mut Frame, app: &mut App, area: Rect) {
         .use_unicode(app.enhanced_graphics)
         .label(label)
         .ratio(app.progress);
-    f.render_widget(gauge, chunks[0]);
+    gauge.render(chunks[0], f.buffer_mut());
 
     let sparkline = Sparkline::default()
         .block(Block::new().title("Sparkline:"))
@@ -72,7 +72,7 @@ fn draw_gauges(f: &mut Frame, app: &mut App, area: Rect) {
         } else {
             symbols::bar::THREE_LEVELS
         });
-    f.render_widget(sparkline, chunks[1]);
+    sparkline.render(chunks[1], f.buffer_mut());
 
     let line_gauge = LineGauge::default()
         .block(Block::new().title("LineGauge:"))
@@ -83,7 +83,7 @@ fn draw_gauges(f: &mut Frame, app: &mut App, area: Rect) {
             symbols::line::NORMAL
         })
         .ratio(app.progress);
-    f.render_widget(line_gauge, chunks[2]);
+    line_gauge.render(chunks[2], f.buffer_mut());
 }
 
 #[allow(clippy::too_many_lines)]
@@ -160,7 +160,7 @@ fn draw_charts(f: &mut Frame, app: &mut App, area: Rect) {
             )
             .label_style(Style::default().fg(Color::Yellow))
             .bar_style(Style::default().fg(Color::Green));
-        f.render_widget(barchart, chunks[1]);
+        barchart.render(chunks[1], f.buffer_mut());
     }
     if app.show_chart {
         let x_labels = vec![
@@ -220,7 +220,7 @@ fn draw_charts(f: &mut Frame, app: &mut App, area: Rect) {
                         Span::styled("20", Style::default().add_modifier(Modifier::BOLD)),
                     ]),
             );
-        f.render_widget(chart, chunks[1]);
+        chart.render(chunks[1], f.buffer_mut());
     }
 }
 
@@ -259,7 +259,7 @@ fn draw_text(f: &mut Frame, area: Rect) {
             .add_modifier(Modifier::BOLD),
     ));
     let paragraph = Paragraph::new(text).block(block).wrap(Wrap { trim: true });
-    f.render_widget(paragraph, area);
+    paragraph.render(area, f.buffer_mut());
 }
 
 fn draw_second_tab(f: &mut Frame, app: &mut App, area: Rect) {
@@ -291,7 +291,7 @@ fn draw_second_tab(f: &mut Frame, app: &mut App, area: Rect) {
             .bottom_margin(1),
     )
     .block(Block::bordered().title("Servers"));
-    f.render_widget(table, chunks[0]);
+    Widget::render(table, chunks[0], f.buffer_mut());
 
     let map = Canvas::default()
         .block(Block::bordered().title("World"))
@@ -345,7 +345,7 @@ fn draw_second_tab(f: &mut Frame, app: &mut App, area: Rect) {
         })
         .x_bounds([-180.0, 180.0])
         .y_bounds([-90.0, 90.0]);
-    f.render_widget(map, chunks[1]);
+    map.render(chunks[1], f.buffer_mut());
 }
 
 fn draw_third_tab(f: &mut Frame, _app: &mut App, area: Rect) {
@@ -389,5 +389,5 @@ fn draw_third_tab(f: &mut Frame, _app: &mut App, area: Rect) {
         ],
     )
     .block(Block::bordered().title("Colors"));
-    f.render_widget(table, chunks[0]);
+    Widget::render(table, chunks[0], f.buffer_mut());
 }

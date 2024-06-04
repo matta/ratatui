@@ -105,7 +105,7 @@ impl App {
     /// This is the main event loop for the app.
     pub fn run(mut self, mut terminal: Terminal<impl Backend>) -> Result<()> {
         while self.is_running() {
-            terminal.draw(|frame| frame.render_widget(&mut self, frame.size()))?;
+            terminal.draw(|frame| self.render(frame.size(), frame.buffer_mut()))?;
             self.handle_events()?;
         }
         Ok(())

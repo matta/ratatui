@@ -158,13 +158,13 @@ fn ui(f: &mut Frame, app: &mut App) {
     let title = Block::new()
         .title_alignment(Alignment::Center)
         .title("Use h j k l or ◄ ▲ ▼ ► to scroll ".bold());
-    f.render_widget(title, chunks[0]);
+    title.render(chunks[0], f.buffer_mut());
 
     let paragraph = Paragraph::new(text.clone())
         .gray()
         .block(create_block("Vertical scrollbar with arrows"))
         .scroll((app.vertical_scroll as u16, 0));
-    f.render_widget(paragraph, chunks[1]);
+    paragraph.render(chunks[1], f.buffer_mut());
     f.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(Some("↑"))
@@ -179,7 +179,7 @@ fn ui(f: &mut Frame, app: &mut App) {
             "Vertical scrollbar without arrows, without track symbol and mirrored",
         ))
         .scroll((app.vertical_scroll as u16, 0));
-    f.render_widget(paragraph, chunks[2]);
+    paragraph.render(chunks[2], f.buffer_mut());
     f.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalLeft)
             .symbols(scrollbar::VERTICAL)
@@ -199,7 +199,7 @@ fn ui(f: &mut Frame, app: &mut App) {
             "Horizontal scrollbar with only begin arrow & custom thumb symbol",
         ))
         .scroll((0, app.horizontal_scroll as u16));
-    f.render_widget(paragraph, chunks[3]);
+    paragraph.render(chunks[3], f.buffer_mut());
     f.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
             .thumb_symbol("🬋")
@@ -217,7 +217,7 @@ fn ui(f: &mut Frame, app: &mut App) {
             "Horizontal scrollbar without arrows & custom thumb and track symbol",
         ))
         .scroll((0, app.horizontal_scroll as u16));
-    f.render_widget(paragraph, chunks[4]);
+    paragraph.render(chunks[4], f.buffer_mut());
     f.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
             .thumb_symbol("░")

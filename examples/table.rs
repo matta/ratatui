@@ -335,7 +335,7 @@ fn render_footer(f: &mut Frame, app: &App, area: Rect) {
                 .border_type(BorderType::Double)
                 .border_style(Style::new().fg(app.colors.footer_border_color)),
         );
-    f.render_widget(info_footer, area);
+    info_footer.render(area, f.buffer_mut());
 }
 
 #[cfg(test)]

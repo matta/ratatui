@@ -421,7 +421,7 @@ mod test {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_widget(paragraph.clone(), size);
+                paragraph.clone().render(size, f.buffer_mut());
             })
             .unwrap();
         terminal.backend().assert_buffer(expected);

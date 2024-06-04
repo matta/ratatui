@@ -5,7 +5,7 @@ use ratatui::{
     style::{Color, Style},
     symbols,
     text::Line,
-    widgets::{Block, Borders, HighlightSpacing, List, ListItem, ListState},
+    widgets::{Block, Borders, HighlightSpacing, List, ListItem, ListState, Widget},
     Terminal,
 };
 use rstest::rstest;
@@ -281,7 +281,7 @@ fn widget_list_should_not_ignore_empty_string_items() {
                 .style(Style::default())
                 .highlight_style(Style::default());
 
-            f.render_widget(list, f.size());
+            list.render(f.size(), f.buffer_mut());
         })
         .unwrap();
     terminal

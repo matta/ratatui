@@ -3,7 +3,7 @@ use ratatui::{
     buffer::Buffer,
     layout::Alignment,
     text::{Line, Span, Text},
-    widgets::{Block, Padding, Paragraph, Wrap},
+    widgets::{Block, Padding, Paragraph, Widget, Wrap},
     Terminal,
 };
 
@@ -15,8 +15,7 @@ fn test_case(paragraph: Paragraph, expected: &Buffer) {
     let mut terminal = Terminal::new(backend).unwrap();
     terminal
         .draw(|f| {
-            let size = f.size();
-            f.render_widget(paragraph, size);
+            paragraph.render(f.size(), f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer(expected);
@@ -61,7 +60,7 @@ fn widgets_paragraph_renders_mixed_width_graphemes() {
             let paragraph = Paragraph::new(text)
                 .block(Block::bordered())
                 .wrap(Wrap { trim: true });
-            f.render_widget(paragraph, size);
+            paragraph.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([

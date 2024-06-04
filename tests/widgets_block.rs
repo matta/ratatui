@@ -6,7 +6,7 @@ use ratatui::{
     text::Span,
     widgets::{
         block::title::{Position, Title},
-        Block, Borders,
+        Block, Borders, Widget,
     },
     Terminal,
 };
@@ -19,7 +19,7 @@ fn widgets_block_renders() {
     let block =
         Block::bordered().title(Span::styled("Title", Style::default().fg(Color::LightBlue)));
     terminal
-        .draw(|frame| frame.render_widget(block, Rect::new(0, 0, 8, 8)))
+        .draw(|frame| block.render(Rect::new(0, 0, 8, 8), frame.buffer_mut()))
         .unwrap();
     let mut expected = Buffer::with_lines([
         "┌Title─┐  ",
@@ -50,7 +50,7 @@ fn widgets_block_titles_overlap() {
         let backend = TestBackend::new(area.width, area.height);
         let mut terminal = Terminal::new(backend).unwrap();
         terminal
-            .draw(|frame| frame.render_widget(block, area))
+            .draw(|frame| block.render(area, frame.buffer_mut()))
             .unwrap();
         terminal.backend().assert_buffer_lines(expected);
     }
@@ -103,7 +103,7 @@ fn widgets_block_renders_on_small_areas() {
         let backend = TestBackend::new(area.width, area.height);
         let mut terminal = Terminal::new(backend).unwrap();
         terminal
-            .draw(|frame| frame.render_widget(block, area))
+            .draw(|frame| block.render(area, frame.buffer_mut()))
             .unwrap();
         terminal.backend().assert_buffer(expected);
     }
@@ -286,7 +286,7 @@ fn widgets_block_title_alignment_top<'line, Lines>(
 
     for block in [block1, block2] {
         terminal
-            .draw(|frame| frame.render_widget(block, area))
+            .draw(|f| block.render(area, f.buffer_mut()))
             .unwrap();
         terminal.backend().assert_buffer(&expected);
     }
@@ -385,7 +385,7 @@ fn widgets_block_title_alignment_bottom<'line, Lines>(
     let block = Block::default().title(title).borders(borders);
     let area = Rect::new(1, 0, 13, 3);
     terminal
-        .draw(|frame| frame.render_widget(block, area))
+        .draw(|f| block.render(area, f.buffer_mut()))
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
 }
@@ -483,9 +483,7 @@ fn widgets_block_multiple_titles<'line, Lines>(
         .borders(borders);
     let area = Rect::new(1, 0, 13, 3);
     terminal
-        .draw(|f| {
-            f.render_widget(block, area);
-        })
+        .draw(|f| block.render(area, f.buffer_mut()))
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
 }

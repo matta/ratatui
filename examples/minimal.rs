@@ -18,7 +18,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use ratatui::{backend::CrosstermBackend, text::Text, Terminal};
+use ratatui::{backend::CrosstermBackend, text::Text, widgets::Widget, Terminal};
 
 /// This is a bare minimum example. There are many approaches to running an application loop, so
 /// this is not meant to be prescriptive. See the [examples] folder for more complete examples.
@@ -31,7 +31,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_raw_mode()?;
     execute!(terminal.backend_mut(), EnterAlternateScreen)?;
     loop {
-        terminal.draw(|frame| frame.render_widget(Text::raw("Hello World!"), frame.size()))?;
+        terminal
+            .draw(|frame| Text::raw("Hello World!").render(frame.size(), frame.buffer_mut()))?;
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
                 break;

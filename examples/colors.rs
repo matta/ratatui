@@ -111,7 +111,7 @@ fn render_named_colors(frame: &mut Frame, area: Rect) {
 fn render_fg_named_colors(frame: &mut Frame, bg: Color, area: Rect) {
     let block = title_block(format!("Foreground colors on {bg} background"));
     let inner = block.inner(area);
-    frame.render_widget(block, area);
+    block.render(area, frame.buffer_mut());
 
     let layout = Layout::vertical([Constraint::Length(1); 2])
         .split(inner)
@@ -125,14 +125,14 @@ fn render_fg_named_colors(frame: &mut Frame, bg: Color, area: Rect) {
     for (i, &fg) in NAMED_COLORS.iter().enumerate() {
         let color_name = fg.to_string();
         let paragraph = Paragraph::new(color_name).fg(fg).bg(bg);
-        frame.render_widget(paragraph, layout[i]);
+        paragraph.render(layout[i], frame.buffer_mut());
     }
 }
 
 fn render_bg_named_colors(frame: &mut Frame, fg: Color, area: Rect) {
     let block = title_block(format!("Background colors with {fg} foreground"));
     let inner = block.inner(area);
-    frame.render_widget(block, area);
+    block.render(area, frame.buffer_mut());
 
     let layout = Layout::vertical([Constraint::Length(1); 2])
         .split(inner)
@@ -146,14 +146,14 @@ fn render_bg_named_colors(frame: &mut Frame, fg: Color, area: Rect) {
     for (i, &bg) in NAMED_COLORS.iter().enumerate() {
         let color_name = bg.to_string();
         let paragraph = Paragraph::new(color_name).fg(fg).bg(bg);
-        frame.render_widget(paragraph, layout[i]);
+        paragraph.render(layout[i], frame.buffer_mut());
     }
 }
 
 fn render_indexed_colors(frame: &mut Frame, area: Rect) {
     let block = title_block("Indexed colors".into());
     let inner = block.inner(area);
-    frame.render_widget(block, area);
+    block.render(area, frame.buffer_mut());
 
     let layout = Layout::vertical([
         Constraint::Length(1), // 0 - 15
@@ -175,7 +175,7 @@ fn render_indexed_colors(frame: &mut Frame, area: Rect) {
             color_index.fg(color).bg(bg),
             "██".bg(color).fg(color),
         ]));
-        frame.render_widget(paragraph, color_layout[i as usize]);
+        paragraph.render(color_layout[i as usize], frame.buffer_mut());
     }
 
     //   16  17  18  19  20  21   52  53  54  55  56  57   88  89  90  91  92  93
@@ -225,7 +225,7 @@ fn render_indexed_colors(frame: &mut Frame, area: Rect) {
             // character. This is a workaround to make the bug less obvious.
             "███".reversed(),
         ]));
-        frame.render_widget(paragraph, index_layout[i as usize - 16]);
+        paragraph.render(index_layout[i as usize - 16], frame.buffer_mut());
     }
 }
 
@@ -264,7 +264,7 @@ fn render_indexed_grayscale(frame: &mut Frame, area: Rect) {
             // character. This is a workaround to make the bug less obvious.
             "███████".reversed(),
         ]));
-        frame.render_widget(paragraph, layout[i as usize - 232]);
+        paragraph.render(layout[i as usize - 232], frame.buffer_mut());
     }
 }
 

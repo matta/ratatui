@@ -50,10 +50,9 @@ fn main() -> io::Result<()> {
 }
 
 fn hello_world(frame: &mut Frame) {
-    frame.render_widget(
-        Paragraph::new("Hello World!").block(Block::bordered().title("Greeting")),
-        frame.size(),
-    );
+    Paragraph::new("Hello World!")
+        .block(Block::bordered().title("Greeting"))
+        .render(frame.size(), frame.buffer_mut());
 }
 
 use crossterm::event::{self, Event, KeyCode};
@@ -78,16 +77,20 @@ fn layout(frame: &mut Frame) {
     let [title_bar, main_area, status_bar] = vertical.areas(frame.size());
     let [left, right] = horizontal.areas(main_area);
 
-    frame.render_widget(
-        Block::new().borders(Borders::TOP).title("Title Bar"),
-        title_bar,
-    );
-    frame.render_widget(
-        Block::new().borders(Borders::TOP).title("Status Bar"),
-        status_bar,
-    );
-    frame.render_widget(Block::bordered().title("Left"), left);
-    frame.render_widget(Block::bordered().title("Right"), right);
+    Block::new()
+        .borders(Borders::TOP)
+        .title("Title Bar")
+        .render(title_bar, frame.buffer_mut());
+    Block::new()
+        .borders(Borders::TOP)
+        .title("Status Bar")
+        .render(status_bar, frame.buffer_mut());
+    Block::bordered()
+        .title("Left")
+        .render(left, frame.buffer_mut());
+    Block::bordered()
+        .title("Right")
+        .render(right, frame.buffer_mut());
 }
 
 fn styling(frame: &mut Frame) {
@@ -113,18 +116,17 @@ fn styling(frame: &mut Frame) {
     let line = Line::from(vec![span1, span2, span3]);
     let text: Text = Text::from(vec![line]);
 
-    frame.render_widget(Paragraph::new(text), areas[0]);
+    Paragraph::new(text).render(areas[0], frame.buffer_mut());
     // or using the short-hand syntax and implicit conversions
-    frame.render_widget(
-        Paragraph::new("Hello World!".red().on_white().bold()),
-        areas[1],
-    );
+    Paragraph::new("Hello World!".red().on_white().bold()).render(areas[1], frame.buffer_mut());
 
     // to style the whole widget instead of just the text
-    frame.render_widget(
-        Paragraph::new("Hello World!").style(Style::new().red().on_white()),
-        areas[2],
-    );
+    Paragraph::new("Hello World!")
+        .style(Style::new().red().on_white())
+        .render(areas[2], frame.buffer_mut());
     // or using the short-hand syntax
-    frame.render_widget(Paragraph::new("Hello World!").blue().on_yellow(), areas[3]);
+    Paragraph::new("Hello World!")
+        .blue()
+        .on_yellow()
+        .render(areas[3], frame.buffer_mut());
 }

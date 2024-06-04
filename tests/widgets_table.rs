@@ -6,7 +6,7 @@ use ratatui::{
     layout::Constraint,
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Cell, HighlightSpacing, Row, Table, TableState},
+    widgets::{Block, Borders, Cell, HighlightSpacing, Row, Table, TableState, Widget},
     Terminal,
 };
 use rstest::rstest;
@@ -88,7 +88,7 @@ fn widgets_table_column_spacing_can_be_changed<'line, Lines>(
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(column_spacing);
-            f.render_widget(table, size);
+            table.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -166,7 +166,7 @@ fn widgets_table_columns_widths_can_use_fixed_length_constraints<'line, Lines>(
             )
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered());
-            f.render_widget(table, size);
+            table.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -257,7 +257,7 @@ fn widgets_table_columns_widths_can_use_percentage_constraints<'line, Lines>(
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(0);
-            f.render_widget(table, size);
+            table.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -351,7 +351,7 @@ fn widgets_table_columns_widths_can_use_mixed_constraints<'line, Lines>(
             )
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered());
-            f.render_widget(table, size);
+            table.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -438,7 +438,7 @@ fn widgets_table_columns_widths_can_use_ratio_constraints<'line, Lines>(
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(0);
-            f.render_widget(table, size);
+            table.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -731,7 +731,7 @@ fn widgets_table_should_render_even_if_empty() {
             .header(Row::new(vec!["Head1", "Head2", "Head3"]))
             .block(Block::new().borders(Borders::LEFT | Borders::RIGHT))
             .column_spacing(1);
-            f.render_widget(table, size);
+            table.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([

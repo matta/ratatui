@@ -80,7 +80,7 @@ fn draw(f: &mut Frame) {
     });
     for col in cols {
         let cal = cals::get_cal(start.month(), start.year(), &list);
-        f.render_widget(cal, col);
+        cal.render(col, f.buffer_mut());
         start = start.replace_month(start.month().next()).unwrap();
     }
 }

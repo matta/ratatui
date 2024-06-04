@@ -5,7 +5,7 @@ use ratatui::{
     style::{Color, Style},
     symbols,
     text::{self, Span},
-    widgets::{Axis, Block, Chart, Dataset, GraphType::Line},
+    widgets::{Axis, Block, Chart, Dataset, GraphType::Line, Widget},
     Terminal,
 };
 use rstest::rstest;
@@ -30,7 +30,7 @@ fn axis_test_case<'line, Lines>(
     terminal
         .draw(|f| {
             let chart = Chart::new(vec![]).x_axis(x_axis).y_axis(y_axis);
-            f.render_widget(chart, f.size());
+            chart.render(f.size(), f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -63,7 +63,7 @@ fn widgets_chart_can_render_on_small_areas(#[case] width: u16, #[case] height: u
                         .bounds([0.0, 0.0])
                         .labels(create_labels(&["0.0", "1.0"])),
                 );
-            f.render_widget(chart, f.size());
+            chart.render(f.size(), f.buffer_mut());
         })
         .unwrap();
 }
@@ -279,14 +279,14 @@ fn widgets_chart_can_have_axis_with_zero_length_bounds() {
                         .bounds([0.0, 0.0])
                         .labels(create_labels(&["0.0", "1.0"])),
                 );
-            f.render_widget(
-                chart,
+            chart.render(
                 Rect {
                     x: 0,
                     y: 0,
                     width: 100,
                     height: 100,
                 },
+                f.buffer_mut(),
             );
         })
         .unwrap();
@@ -319,14 +319,14 @@ fn widgets_chart_handles_overflows() {
                         .bounds([0.0, 1.0])
                         .labels(create_labels(&["0.0", "1.0"])),
                 );
-            f.render_widget(
-                chart,
+            chart.render(
                 Rect {
                     x: 0,
                     y: 0,
                     width: 80,
                     height: 30,
                 },
+                f.buffer_mut(),
             );
         })
         .unwrap();
@@ -352,14 +352,14 @@ fn widgets_chart_can_have_empty_datasets() {
                         .bounds([0.0, 1.0])
                         .labels(create_labels(&["0.0", "1.0"])),
                 );
-            f.render_widget(
-                chart,
+            chart.render(
                 Rect {
                     x: 0,
                     y: 0,
                     width: 100,
                     height: 100,
                 },
+                f.buffer_mut(),
             );
         })
         .unwrap();
@@ -423,14 +423,14 @@ fn widgets_chart_can_have_a_legend() {
                         .title("Y Axis")
                         .labels(create_labels(&["0.0", "5.0", "10.0"])),
                 );
-            f.render_widget(
-                chart,
+            chart.render(
                 Rect {
                     x: 0,
                     y: 0,
                     width: 60,
                     height: 30,
                 },
+                f.buffer_mut(),
             );
         })
         .unwrap();
@@ -639,7 +639,7 @@ fn widgets_chart_top_line_styling_is_correct() {
                     .labels(create_labels(&["a", "b"])),
             )
             .x_axis(Axis::default().bounds([0.0, 1.0]));
-            f.render_widget(widget, f.size());
+            widget.render(f.size(), f.buffer_mut());
         })
         .unwrap();
 
