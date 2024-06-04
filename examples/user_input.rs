@@ -269,5 +269,5 @@ fn ui(f: &mut Frame, app: &App) {
         })
         .collect();
     let messages = List::new(messages).block(Block::bordered().title("Messages"));
-    Widget::render(messages, messages_area, f.buffer_mut());
+    messages.render_without_state(messages_area, f.buffer_mut());
 }

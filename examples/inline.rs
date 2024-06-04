@@ -274,7 +274,7 @@ fn ui(f: &mut Frame, downloads: &Downloads) {
         })
         .collect();
     let list = List::new(items);
-    Widget::render(list, list_area, f.buffer_mut());
+    list.render_without_state(list_area, f.buffer_mut());
 
     #[allow(clippy::cast_possible_truncation)]
     for (i, (_, download)) in downloads.in_progress.iter().enumerate() {

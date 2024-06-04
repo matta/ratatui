@@ -2,7 +2,7 @@ use criterion::{criterion_group, criterion_main, BatchSize, Bencher, BenchmarkId
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
-    widgets::{List, ListItem, ListState, Widget},
+    widgets::{List, ListItem, ListState},
 };
 
 /// Benchmark for rendering a list.
@@ -49,7 +49,7 @@ fn render(bencher: &mut Bencher, list: &List) {
     bencher.iter_batched(
         || list.to_owned(),
         |bench_list| {
-            Widget::render(bench_list, buffer.area, &mut buffer);
+            bench_list.render_without_state(buffer.area, &mut buffer);
         },
         BatchSize::LargeInput,
     );
