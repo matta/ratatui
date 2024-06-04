@@ -2055,7 +2055,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(list, size, &mut state);
+                StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
             })
             .unwrap();
         terminal.backend().assert_buffer_lines(expected);
@@ -2081,7 +2081,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(&list, size, &mut state);
+                StatefulWidget::render(list.clone(), size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2090,7 +2090,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(&list, size, &mut state);
+                StatefulWidget::render(&list, size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2117,7 +2117,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(list, size, &mut state);
+                StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2152,7 +2152,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(list, size, &mut state);
+                StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 

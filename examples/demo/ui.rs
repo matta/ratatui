@@ -113,7 +113,7 @@ fn draw_charts(f: &mut Frame, app: &mut App, area: Rect) {
                 .block(Block::bordered().title("List"))
                 .highlight_style(Style::default().add_modifier(Modifier::BOLD))
                 .highlight_symbol("> ");
-            f.render_stateful_widget(tasks, chunks[0], &mut app.tasks.state);
+            StatefulWidget::render(tasks, chunks[0], f.buffer_mut(), &mut app.tasks.state);
 
             // Draw logs
             let info_style = Style::default().fg(Color::Blue);
@@ -139,7 +139,7 @@ fn draw_charts(f: &mut Frame, app: &mut App, area: Rect) {
                 })
                 .collect();
             let logs = List::new(logs).block(Block::bordered().title("List"));
-            f.render_stateful_widget(logs, chunks[1], &mut app.logs.state);
+            StatefulWidget::render(logs, chunks[1], f.buffer_mut(), &mut app.logs.state);
         }
 
         let barchart = BarChart::default()

@@ -284,7 +284,7 @@ fn render_table(f: &mut Frame, app: &mut App, area: Rect) {
     ]))
     .bg(app.colors.buffer_bg)
     .highlight_spacing(HighlightSpacing::Always);
-    f.render_stateful_widget(t, area, &mut app.state);
+    StatefulWidget::render(t, area, f.buffer_mut(), &mut app.state);
 }
 
 fn constraint_len_calculator(items: &[Data]) -> (u16, u16, u16) {
@@ -313,17 +313,18 @@ fn constraint_len_calculator(items: &[Data]) -> (u16, u16, u16) {
 }
 
 fn render_scrollbar(f: &mut Frame, app: &mut App, area: Rect) {
-    f.render_stateful_widget(
-        Scrollbar::default()
-            .orientation(ScrollbarOrientation::VerticalRight)
-            .begin_symbol(None)
-            .end_symbol(None),
-        area.inner(&Margin {
-            vertical: 1,
-            horizontal: 1,
-        }),
-        &mut app.scroll_state,
-    );
+    Scrollbar::default()
+        .orientation(ScrollbarOrientation::VerticalRight)
+        .begin_symbol(None)
+        .end_symbol(None)
+        .render(
+            area.inner(&Margin {
+                vertical: 1,
+                horizontal: 1,
+            }),
+            f.buffer_mut(),
+            &mut app.scroll_state,
+        );
 }
 
 fn render_footer(f: &mut Frame, app: &App, area: Rect) {

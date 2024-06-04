@@ -5,7 +5,9 @@ use ratatui::{
     style::{Color, Style},
     symbols,
     text::Line,
-    widgets::{Block, Borders, HighlightSpacing, List, ListItem, ListState, Widget},
+    widgets::{
+        Block, Borders, HighlightSpacing, List, ListItem, ListState, StatefulWidget, Widget,
+    },
     Terminal,
 };
 use rstest::rstest;
@@ -43,7 +45,7 @@ fn widgets_list_should_highlight_the_selected_item() {
             let list = List::new(items)
                 .highlight_style(Style::default().bg(Color::Yellow))
                 .highlight_symbol(">> ");
-            f.render_stateful_widget(list, size, &mut state);
+            StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     #[rustfmt::skip]
@@ -78,7 +80,7 @@ fn widgets_list_should_highlight_the_selected_item_wide_symbol() {
             let list = List::new(items)
                 .highlight_style(Style::default().bg(Color::Yellow))
                 .highlight_symbol(wide_symbol);
-            f.render_stateful_widget(list, size, &mut state);
+            StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     #[rustfmt::skip]
@@ -138,7 +140,7 @@ fn widgets_list_should_truncate_items() {
                 let list = List::new(case.items.clone())
                     .block(Block::new().borders(Borders::RIGHT))
                     .highlight_symbol(">> ");
-                f.render_stateful_widget(list, Rect::new(0, 0, 8, 2), &mut state);
+                StatefulWidget::render(list, Rect::new(0, 0, 8, 2), f.buffer_mut(), &mut state);
             })
             .unwrap();
         terminal.backend().assert_buffer(&case.expected);
@@ -165,7 +167,7 @@ fn widgets_list_should_clamp_offset_if_items_are_removed() {
                 ListItem::new("Item 5"),
             ];
             let list = List::new(items).highlight_symbol(">> ");
-            f.render_stateful_widget(list, size, &mut state);
+            StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([
@@ -182,7 +184,7 @@ fn widgets_list_should_clamp_offset_if_items_are_removed() {
             let size = f.size();
             let items = vec![ListItem::new("Item 3")];
             let list = List::new(items).highlight_symbol(">> ");
-            f.render_stateful_widget(list, size, &mut state);
+            StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([
@@ -210,7 +212,7 @@ fn widgets_list_should_display_multiline_items() {
             let list = List::new(items)
                 .highlight_style(Style::default().bg(Color::Yellow))
                 .highlight_symbol(">> ");
-            f.render_stateful_widget(list, size, &mut state);
+            StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     let mut expected = Buffer::with_lines([
@@ -246,7 +248,7 @@ fn widgets_list_should_repeat_highlight_symbol() {
                 .highlight_style(Style::default().bg(Color::Yellow))
                 .highlight_symbol(">> ")
                 .repeat_highlight_symbol(true);
-            f.render_stateful_widget(list, size, &mut state);
+            StatefulWidget::render(list, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     let mut expected = Buffer::with_lines([
@@ -281,7 +283,7 @@ fn widget_list_should_not_ignore_empty_string_items() {
                 .style(Style::default())
                 .highlight_style(Style::default());
 
-            list.render(f.size(), f.buffer_mut());
+            Widget::render(list, f.size(), f.buffer_mut());
         })
         .unwrap();
     terminal
@@ -372,7 +374,7 @@ fn widgets_list_enable_always_highlight_spacing<'line, Lines>(
             .block(Block::bordered())
             .highlight_symbol(">> ")
             .highlight_spacing(space);
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal

@@ -67,17 +67,17 @@ where
             let list = List::new(items)
                 .highlight_symbol(">>")
                 .block(Block::new().borders(Borders::RIGHT));
-            f.render_stateful_widget(list, layout[0], &mut state.list);
+            StatefulWidget::render(list, layout[0], f.buffer_mut(), &mut state.list);
 
             let table = Table::new(
                 items.into_iter().map(|i| Row::new(vec![i])),
                 [Constraint::Length(10); 1],
             )
             .highlight_symbol(">>");
-            f.render_stateful_widget(table, layout[1], &mut state.table);
+            StatefulWidget::render(table, layout[1], f.buffer_mut(), &mut state.table);
 
             let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
-            f.render_stateful_widget(scrollbar, layout[2], &mut state.scrollbar);
+            scrollbar.render(layout[2], f.buffer_mut(), &mut state.scrollbar);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
