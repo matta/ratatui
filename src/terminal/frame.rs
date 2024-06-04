@@ -71,6 +71,7 @@ impl Frame<'_> {
     /// ```
     ///
     /// [`Layout`]: crate::layout::Layout
+    #[deprecated(since = "0.0.0", note = "NO_WIDGET_EXPERIMENT")]
     pub fn render_widget<W: Widget>(&mut self, widget: W, area: Rect) {
         widget.render(area, self.buffer);
     }
