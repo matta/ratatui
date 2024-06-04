@@ -6,7 +6,6 @@ use ratatui::{
     layout::{Alignment, Rect},
     style::Stylize,
     text::Line,
-    widgets::Widget,
 };
 
 fn line_render(criterion: &mut Criterion) {

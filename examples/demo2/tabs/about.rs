@@ -51,10 +51,8 @@ impl AboutTab {
     pub fn next_row(&mut self) {
         self.row_index = self.row_index.saturating_add(1);
     }
-}
 
-impl Widget for AboutTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    pub fn render(self, area: Rect, buf: &mut Buffer) {
         RgbSwatch.render(area, buf);
         let horizontal = Layout::horizontal([Constraint::Length(34), Constraint::Min(0)]);
         let [description, logo] = horizontal.areas(area);

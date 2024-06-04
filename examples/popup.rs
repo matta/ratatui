@@ -96,16 +96,16 @@ fn ui(f: &mut Frame, app: &App) {
     let paragraph = Paragraph::new(text.slow_blink())
         .centered()
         .wrap(Wrap { trim: true });
-    f.render_widget(paragraph, instructions);
+    paragraph.render(instructions, f.buffer_mut());
 
     let block = Block::bordered().title("Content").on_blue();
-    f.render_widget(block, content);
+    block.render(content, f.buffer_mut());
 
     if app.show_popup {
         let block = Block::bordered().title("Popup");
         let area = centered_rect(60, 20, area);
-        f.render_widget(Clear, area); //this clears out the background
-        f.render_widget(block, area);
+        Clear.render(area, f.buffer_mut()); //this clears out the background
+        block.render(area, f.buffer_mut());
     }
 }
 

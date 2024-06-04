@@ -200,7 +200,7 @@ fn render_chart1(f: &mut Frame, area: Rect, app: &App) {
                 .bounds([-20.0, 20.0]),
         );
 
-    f.render_widget(chart, area);
+    chart.render(area, f.buffer_mut());
 }
 
 fn render_line_chart(f: &mut Frame, area: Rect) {
@@ -236,7 +236,7 @@ fn render_line_chart(f: &mut Frame, area: Rect) {
         .legend_position(Some(LegendPosition::TopLeft))
         .hidden_legend_constraints((Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)));
 
-    f.render_widget(chart, area);
+    chart.render(area, f.buffer_mut());
 }
 
 fn render_scatter(f: &mut Frame, area: Rect) {
@@ -285,7 +285,7 @@ fn render_scatter(f: &mut Frame, area: Rect) {
         )
         .hidden_legend_constraints((Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)));
 
-    f.render_widget(chart, area);
+    chart.render(area, f.buffer_mut());
 }
 
 // Data from https://ourworldindata.org/space-exploration-satellites

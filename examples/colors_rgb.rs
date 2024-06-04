@@ -105,7 +105,7 @@ impl App {
     /// This is the main event loop for the app.
     pub fn run(mut self, mut terminal: Terminal<impl Backend>) -> Result<()> {
         while self.is_running() {
-            terminal.draw(|frame| frame.render_widget(&mut self, frame.size()))?;
+            terminal.draw(|frame| self.render(frame.size(), frame.buffer_mut()))?;
             self.handle_events()?;
         }
         Ok(())
@@ -132,15 +132,12 @@ impl App {
         }
         Ok(())
     }
-}
 
-/// Implement the Widget trait for &mut App so that it can be rendered
-///
-/// This is implemented on a mutable reference so that the app can update its state while it is
-/// being rendered. This allows the fps widget to update the fps calculation and the colors widget
-/// to update the colors to render.
-impl Widget for &mut App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    /// This is implemented on a mutable reference so that the app can update
+    /// its state while it is being rendered. This allows the fps widget to
+    /// update the fps calculation and the colors widget to update the colors
+    /// to render.
+    fn render(&mut self, area: Rect, buf: &mut Buffer) {
         #[allow(clippy::enum_glob_use)]
         use Constraint::*;
         let [top, colors] = Layout::vertical([Length(1), Min(0)]).areas(area);
@@ -167,21 +164,17 @@ impl Default for FpsWidget {
     }
 }
 
-/// Widget impl for `FpsWidget`
-///
-/// This is implemented on a mutable reference so that we can update the frame count and fps
-/// calculation while rendering.
-impl Widget for &mut FpsWidget {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+impl FpsWidget {
+    /// This is implemented on a mutable reference so that we can update the frame count and fps
+    /// calculation while rendering.
+    fn render(&mut self, area: Rect, buf: &mut Buffer) {
         self.calculate_fps();
         if let Some(fps) = self.fps {
             let text = format!("{fps:.1} fps");
             Text::from(text).render(area, buf);
         }
     }
-}
 
-impl FpsWidget {
     /// Update the fps calculation.
     ///
     /// This updates the fps once a second, but only if the widget has rendered at least 2 frames
@@ -199,13 +192,12 @@ impl FpsWidget {
     }
 }
 
-/// Widget impl for `ColorsWidget`
-///
-/// This is implemented on a mutable reference so that we can update the frame count and store a
-/// cached version of the colors to render instead of recalculating them every frame.
-impl Widget for &mut ColorsWidget {
+impl ColorsWidget {
     /// Render the widget
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    ///
+    /// This is implemented on a mutable reference so that we can update the frame count and store a
+    /// cached version of the colors to render instead of recalculating them every frame.
+    fn render(&mut self, area: Rect, buf: &mut Buffer) {
         self.setup_colors(area);
         let colors = &self.colors;
         for (xi, x) in (area.left()..area.right()).enumerate() {
@@ -222,9 +214,7 @@ impl Widget for &mut ColorsWidget {
         }
         self.frame_count += 1;
     }
-}
 
-impl ColorsWidget {
     /// Setup the colors to render.
     ///
     /// This is called once per frame to setup the colors to render. It caches the colors so that

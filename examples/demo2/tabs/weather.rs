@@ -23,10 +23,8 @@ impl WeatherTab {
     pub fn next(&mut self) {
         self.download_progress = self.download_progress.saturating_add(1);
     }
-}
 
-impl Widget for WeatherTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    pub fn render(self, area: Rect, buf: &mut Buffer) {
         RgbSwatch.render(area, buf);
         let area = area.inner(&Margin {
             vertical: 1,

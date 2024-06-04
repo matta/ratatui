@@ -884,43 +884,19 @@ impl<'a> List<'a> {
 
         (first_visible_index, last_visible_index)
     }
-}
 
-impl Widget for List<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        WidgetRef::render_ref(&self, area, buf);
-    }
-}
-
-impl WidgetRef for List<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// FIXME: write docs
+    pub fn render_without_state(&self, area: Rect, buf: &mut Buffer) {
         let mut state = ListState::default();
-        StatefulWidgetRef::render_ref(self, area, buf, &mut state);
+        self.render_ref(area, buf, &mut state);
     }
-}
 
-impl StatefulWidget for List<'_> {
-    type State = ListState;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        StatefulWidgetRef::render_ref(&self, area, buf, state);
-    }
-}
-
-// Note: remove this when StatefulWidgetRef is stabilized and replace with the blanket impl
-impl StatefulWidget for &List<'_> {
-    type State = ListState;
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        StatefulWidgetRef::render_ref(self, area, buf, state);
-    }
-}
-
-impl StatefulWidgetRef for List<'_> {
-    type State = ListState;
-
-    fn render_ref(&self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+    /// FIXME: write docs
+    pub fn render_ref(&self, area: Rect, buf: &mut Buffer, state: &mut ListState) {
         buf.set_style(area, self.style);
-        self.block.render_ref(area, buf);
+        if let Some(ref block) = self.block {
+            block.render(area, buf);
+        }
         let list_area = self.block.inner_if_some(area);
 
         if list_area.is_empty() || self.items.is_empty() {
@@ -1189,21 +1165,21 @@ mod tests {
     }
 
     /// helper method to render a widget to an empty buffer with the default state
-    fn render_widget(widget: List<'_>, width: u16, height: u16) -> Buffer {
+    fn render_widget(widget: &List<'_>, width: u16, height: u16) -> Buffer {
         let mut buffer = Buffer::empty(Rect::new(0, 0, width, height));
-        Widget::render(widget, buffer.area, &mut buffer);
+        widget.render_without_state(buffer.area, &mut buffer);
         buffer
     }
 
     /// helper method to render a widget to an empty buffer with a given state
     fn render_stateful_widget(
-        widget: List<'_>,
+        widget: &List<'_>,
         state: &mut ListState,
         width: u16,
         height: u16,
     ) -> Buffer {
         let mut buffer = Buffer::empty(Rect::new(0, 0, width, height));
-        StatefulWidget::render(widget, buffer.area, &mut buffer, state);
+        widget.render_ref(buffer.area, &mut buffer, state);
         buffer
     }
 
@@ -1214,11 +1190,11 @@ mod tests {
         let mut buffer = Buffer::empty(Rect::new(0, 0, 15, 3));
 
         // attempt to render into an area of the buffer with 0 width
-        Widget::render(list.clone(), Rect::new(0, 0, 0, 3), &mut buffer);
+        list.render_without_state(Rect::new(0, 0, 0, 3), &mut buffer);
         assert_eq!(&buffer, &Buffer::empty(buffer.area));
 
         // attempt to render into an area of the buffer with 0 height
-        Widget::render(list.clone(), Rect::new(0, 0, 15, 0), &mut buffer);
+        list.render_without_state(Rect::new(0, 0, 15, 0), &mut buffer);
         assert_eq!(&buffer, &Buffer::empty(buffer.area));
 
         let list = List::new(items)
@@ -1226,7 +1202,7 @@ mod tests {
             .block(Block::bordered());
         // attempt to render into an area of the buffer with zero height after
         // setting the block borders
-        Widget::render(list, Rect::new(0, 0, 15, 2), &mut buffer);
+        list.render_without_state(Rect::new(0, 0, 15, 2), &mut buffer);
         #[rustfmt::skip]
         let expected = Buffer::with_lines([
             "┌─────────────┐",
@@ -1247,7 +1223,7 @@ mod tests {
         {
             let list = List::new(items.to_owned()).highlight_symbol(">>");
             let mut buffer = Buffer::empty(Rect::new(0, 0, 10, 5));
-            Widget::render(list, buffer.area, &mut buffer);
+            list.render_without_state(buffer.area, &mut buffer);
             assert_eq!(buffer, Buffer::with_lines(expected));
         }
 
@@ -1263,7 +1239,7 @@ mod tests {
             let list = List::new(items.to_owned()).highlight_symbol(">>");
             let mut state = ListState::default().with_selected(selected);
             let mut buffer = Buffer::empty(Rect::new(0, 0, 10, 5));
-            StatefulWidget::render(list, buffer.area, &mut buffer, &mut state);
+            list.render_ref(buffer.area, &mut buffer, &mut state);
             assert_eq!(buffer, Buffer::with_lines(expected));
         }
 
@@ -1456,7 +1432,7 @@ mod tests {
     #[test]
     fn test_list_items_setter() {
         let list = List::default().items(["Item 0", "Item 1", "Item 2"]);
-        let buffer = render_widget(list, 10, 5);
+        let buffer = render_widget(&list, 10, 5);
         let expected = Buffer::with_lines([
             "Item 0    ",
             "Item 1    ",
@@ -1471,7 +1447,7 @@ mod tests {
     fn test_list_with_empty_strings() {
         let list = List::new(["Item 0", "", "", "Item 1", "Item 2"])
             .block(Block::bordered().title("List"));
-        let buffer = render_widget(list, 10, 7);
+        let buffer = render_widget(&list, 10, 7);
         let expected = Buffer::with_lines([
             "┌List────┐",
             "│Item 0  │",
@@ -1494,7 +1470,7 @@ mod tests {
     #[test]
     fn test_list_block() {
         let list = List::new(["Item 0", "Item 1", "Item 2"]).block(Block::bordered().title("List"));
-        let buffer = render_widget(list, 10, 7);
+        let buffer = render_widget(&list, 10, 7);
         let expected = Buffer::with_lines([
             "┌List────┐",
             "│Item 0  │",
@@ -1510,7 +1486,7 @@ mod tests {
     #[test]
     fn test_list_style() {
         let list = List::new(["Item 0", "Item 1", "Item 2"]).style(Style::default().fg(Color::Red));
-        let buffer = render_widget(list, 10, 5);
+        let buffer = render_widget(&list, 10, 5);
         let expected = Buffer::with_lines([
             "Item 0    ".red(),
             "Item 1    ".red(),
@@ -1528,7 +1504,7 @@ mod tests {
             .highlight_style(Style::default().fg(Color::Yellow));
         let mut state = ListState::default();
         state.select(Some(1));
-        let buffer = render_stateful_widget(list, &mut state, 10, 5);
+        let buffer = render_stateful_widget(&list, &mut state, 10, 5);
         let expected = Buffer::with_lines([
             "  Item 0  ".into(),
             ">>Item 1  ".yellow(),
@@ -1545,7 +1521,7 @@ mod tests {
         {
             let list = List::new(["Item 0", "Item 1", "Item 2"]).highlight_symbol(">>");
             let mut state = ListState::default();
-            let buffer = render_stateful_widget(list, &mut state, 10, 5);
+            let buffer = render_stateful_widget(&list, &mut state, 10, 5);
             let expected = Buffer::with_lines([
                 "Item 0    ",
                 "Item 1    ",
@@ -1561,7 +1537,7 @@ mod tests {
             let list = List::new(["Item 0", "Item 1", "Item 2"]).highlight_symbol(">>");
             let mut state = ListState::default();
             state.select(Some(1));
-            let buffer = render_stateful_widget(list, &mut state, 10, 5);
+            let buffer = render_stateful_widget(&list, &mut state, 10, 5);
             let expected = Buffer::with_lines([
                 "  Item 0  ",
                 ">>Item 1  ",
@@ -1581,7 +1557,7 @@ mod tests {
                 .highlight_symbol(">>")
                 .highlight_spacing(HighlightSpacing::Always);
             let mut state = ListState::default();
-            let buffer = render_stateful_widget(list, &mut state, 10, 5);
+            let buffer = render_stateful_widget(&list, &mut state, 10, 5);
             let expected = Buffer::with_lines([
                 "  Item 0  ",
                 "  Item 1  ",
@@ -1599,7 +1575,7 @@ mod tests {
                 .highlight_spacing(HighlightSpacing::Always);
             let mut state = ListState::default();
             state.select(Some(1));
-            let buffer = render_stateful_widget(list, &mut state, 10, 5);
+            let buffer = render_stateful_widget(&list, &mut state, 10, 5);
             let expected = Buffer::with_lines([
                 "  Item 0  ",
                 ">>Item 1  ",
@@ -1619,7 +1595,7 @@ mod tests {
                 .highlight_symbol(">>")
                 .highlight_spacing(HighlightSpacing::Never);
             let mut state = ListState::default();
-            let buffer = render_stateful_widget(list, &mut state, 10, 5);
+            let buffer = render_stateful_widget(&list, &mut state, 10, 5);
             let expected = Buffer::with_lines([
                 "Item 0    ",
                 "Item 1    ",
@@ -1637,7 +1613,7 @@ mod tests {
                 .highlight_spacing(HighlightSpacing::Never);
             let mut state = ListState::default();
             state.select(Some(1));
-            let buffer = render_stateful_widget(list, &mut state, 10, 5);
+            let buffer = render_stateful_widget(&list, &mut state, 10, 5);
             let expected = Buffer::with_lines([
                 "Item 0    ",
                 "Item 1    ",
@@ -1657,7 +1633,7 @@ mod tests {
             .repeat_highlight_symbol(true);
         let mut state = ListState::default();
         state.select(Some(0));
-        let buffer = render_stateful_widget(list, &mut state, 10, 5);
+        let buffer = render_stateful_widget(&list, &mut state, 10, 5);
         let expected = Buffer::with_lines([
             ">>Item 0  ".yellow(),
             ">>Line 2  ".yellow(),
@@ -1687,7 +1663,7 @@ mod tests {
         Lines::Item: Into<Line<'line>>,
     {
         let list = List::new(["Item 0", "Item 1", "Item 2"]).direction(direction);
-        let buffer = render_widget(list, 10, 4);
+        let buffer = render_widget(&list, 10, 4);
         assert_eq!(buffer, Buffer::with_lines(expected));
     }
 
@@ -1711,14 +1687,14 @@ mod tests {
     {
         #[allow(deprecated)] // For start_corner
         let list = List::new(["Item 0", "Item 1", "Item 2"]).start_corner(corner);
-        let buffer = render_widget(list, 10, 4);
+        let buffer = render_widget(&list, 10, 4);
         assert_eq!(buffer, Buffer::with_lines(expected));
     }
 
     #[test]
     fn test_list_truncate_items() {
         let list = List::new(["Item 0", "Item 1", "Item 2", "Item 3", "Item 4"]);
-        let buffer = render_widget(list, 10, 3);
+        let buffer = render_widget(&list, 10, 3);
         #[rustfmt::skip]
         let expected = Buffer::with_lines([
             "Item 0    ",
@@ -1734,7 +1710,7 @@ mod tests {
             "Item 0", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6",
         ]);
         let mut state = ListState::default().with_offset(3);
-        let buffer = render_stateful_widget(list, &mut state, 6, 3);
+        let buffer = render_stateful_widget(&list, &mut state, 6, 3);
 
         let expected = Buffer::with_lines(["Item 3", "Item 4", "Item 5"]);
         assert_eq!(buffer, expected);
@@ -1763,7 +1739,7 @@ mod tests {
         ];
         let list = List::new(items).highlight_symbol(">>");
         let mut state = ListState::default().with_selected(selected);
-        let buffer = render_stateful_widget(list, &mut state, 15, 3);
+        let buffer = render_stateful_widget(&list, &mut state, 15, 3);
         assert_eq!(buffer, Buffer::with_lines(expected));
     }
 
@@ -1776,7 +1752,7 @@ mod tests {
         let list = List::new(items).highlight_symbol(">>");
         // Set the initial visible range to items 3, 4, and 5
         let mut state = ListState::default().with_selected(Some(1)).with_offset(3);
-        let buffer = render_stateful_widget(list, &mut state, 10, 3);
+        let buffer = render_stateful_widget(&list, &mut state, 10, 3);
 
         #[rustfmt::skip]
         let expected = Buffer::with_lines([
@@ -1802,7 +1778,7 @@ mod tests {
         let list = List::new(items).highlight_symbol(">>");
         // Set the initial visible range to items 3, 4, and 5
         let mut state = ListState::default().with_selected(Some(6)).with_offset(3);
-        let buffer = render_stateful_widget(list, &mut state, 10, 3);
+        let buffer = render_stateful_widget(&list, &mut state, 10, 3);
 
         #[rustfmt::skip]
         let expected = Buffer::with_lines([
@@ -1855,7 +1831,7 @@ mod tests {
             Line::from("Center").alignment(Alignment::Center),
             Line::from("Right").alignment(Alignment::Right),
         ]);
-        let buffer = render_widget(list, 10, 4);
+        let buffer = render_widget(&list, 10, 4);
         let expected = Buffer::with_lines(["Left      ", "  Center  ", "     Right", ""]);
         assert_eq!(buffer, expected);
     }
@@ -1867,7 +1843,7 @@ mod tests {
             Line::from("Even").alignment(Alignment::Center),
             Line::from("Width").alignment(Alignment::Right),
         ]);
-        let buffer = render_widget(list, 7, 4);
+        let buffer = render_widget(&list, 7, 4);
         let expected = Buffer::with_lines(["Odd    ", " Even  ", "  Width", ""]);
         assert_eq!(buffer, expected);
     }
@@ -1879,7 +1855,7 @@ mod tests {
             Line::from("Even").alignment(Alignment::Center),
             Line::from("Width").alignment(Alignment::Right),
         ]);
-        let buffer = render_widget(list, 6, 4);
+        let buffer = render_widget(&list, 6, 4);
         let expected = Buffer::with_lines(["Odd   ", " Even ", " Width", ""]);
         assert_eq!(buffer, expected);
     }
@@ -1891,7 +1867,7 @@ mod tests {
             Line::from("Even").alignment(Alignment::Center),
             Line::from("Width").alignment(Alignment::Right),
         ]);
-        let buffer = render_widget(list, 8, 4);
+        let buffer = render_widget(&list, 8, 4);
         let expected = Buffer::with_lines(["Odd     ", "  Even  ", "   Width", ""]);
         assert_eq!(buffer, expected);
     }
@@ -1903,7 +1879,7 @@ mod tests {
             Line::from("Even").alignment(Alignment::Center),
             Line::from("Width").alignment(Alignment::Right),
         ]);
-        let buffer = render_widget(list, 6, 4);
+        let buffer = render_widget(&list, 6, 4);
         let expected = Buffer::with_lines(["Odd   ", " Even ", " Width", ""]);
         assert_eq!(buffer, expected);
     }
@@ -1911,7 +1887,7 @@ mod tests {
     #[test]
     fn test_render_list_alignment_zero_line_width() {
         let list = List::new([Line::from("This line has zero width").alignment(Alignment::Center)]);
-        let buffer = render_widget(list, 0, 2);
+        let buffer = render_widget(&list, 0, 2);
         assert_eq!(buffer, Buffer::with_lines([""; 2]));
     }
 
@@ -1919,14 +1895,14 @@ mod tests {
     fn test_render_list_alignment_zero_area_width() {
         let list = List::new([Line::from("Text").alignment(Alignment::Left)]);
         let mut buffer = Buffer::empty(Rect::new(0, 0, 4, 1));
-        Widget::render(list, Rect::new(0, 0, 4, 0), &mut buffer);
+        list.render_without_state(Rect::new(0, 0, 4, 0), &mut buffer);
         assert_eq!(buffer, Buffer::with_lines(["    "]));
     }
 
     #[test]
     fn test_render_list_alignment_line_less_than_width() {
         let list = List::new([Line::from("Small").alignment(Alignment::Center)]);
-        let buffer = render_widget(list, 10, 2);
+        let buffer = render_widget(&list, 10, 2);
         let expected = Buffer::with_lines(["  Small   ", ""]);
         assert_eq!(buffer, expected);
     }
@@ -1934,14 +1910,14 @@ mod tests {
     #[test]
     fn test_render_list_alignment_line_equal_to_width() {
         let list = List::new([Line::from("Exact").alignment(Alignment::Left)]);
-        let buffer = render_widget(list, 5, 2);
+        let buffer = render_widget(&list, 5, 2);
         assert_eq!(buffer, Buffer::with_lines(["Exact", ""]));
     }
 
     #[test]
     fn test_render_list_alignment_line_greater_than_width() {
         let list = List::new([Line::from("Large line").alignment(Alignment::Left)]);
-        let buffer = render_widget(list, 5, 2);
+        let buffer = render_widget(&list, 5, 2);
         assert_eq!(buffer, Buffer::with_lines(["Large", ""]));
     }
 
@@ -2055,7 +2031,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(list, size, &mut state);
+                list.render_ref(size, f.buffer_mut(), &mut state);
             })
             .unwrap();
         terminal.backend().assert_buffer_lines(expected);
@@ -2081,7 +2057,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(&list, size, &mut state);
+                list.render_ref(size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2090,7 +2066,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(&list, size, &mut state);
+                list.render_ref(size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2117,7 +2093,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(list, size, &mut state);
+                list.render_ref(size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2152,7 +2128,7 @@ mod tests {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_stateful_widget(list, size, &mut state);
+                list.render_ref(size, f.buffer_mut(), &mut state);
             })
             .unwrap();
 
@@ -2186,7 +2162,7 @@ mod tests {
         let list = List::new([item]).highlight_symbol(highlight_symbol);
         let mut state = ListState::default();
         state.select(Some(0));
-        StatefulWidget::render(list, single_line_buf.area, &mut single_line_buf, &mut state);
+        list.render_ref(single_line_buf.area, &mut single_line_buf, &mut state);
         assert_eq!(single_line_buf, Buffer::with_lines([expected]));
     }
 }

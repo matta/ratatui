@@ -61,7 +61,7 @@ fn logo() -> String {
 fn main() -> io::Result<()> {
     let mut terminal = init()?;
     terminal.draw(|frame| {
-        frame.render_widget(Paragraph::new(logo()), frame.size());
+        Paragraph::new(logo()).render(frame.size(), frame.buffer_mut());
     })?;
     sleep(Duration::from_secs(5));
     restore()?;

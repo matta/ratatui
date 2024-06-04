@@ -24,7 +24,7 @@ fn barchart_can_be_stylized() {
     let mut terminal = Terminal::new(TestBackend::new(9, 6)).unwrap();
     terminal
         .draw(|f| {
-            f.render_widget(barchart, area);
+            barchart.render(area, f.buffer_mut());
         })
         .unwrap();
 
@@ -68,7 +68,7 @@ fn block_can_be_stylized() -> io::Result<()> {
     let area = Rect::new(0, 0, 8, 3);
     let mut terminal = Terminal::new(TestBackend::new(11, 4))?;
     terminal.draw(|f| {
-        f.render_widget(block, area);
+        block.render(area, f.buffer_mut());
     })?;
 
     #[rustfmt::skip]
@@ -100,7 +100,7 @@ fn paragraph_can_be_stylized() -> io::Result<()> {
     let area = Rect::new(0, 0, 10, 1);
     let mut terminal = Terminal::new(TestBackend::new(10, 1))?;
     terminal.draw(|f| {
-        f.render_widget(paragraph, area);
+        paragraph.render(area, f.buffer_mut());
     })?;
 
     let mut expected = Buffer::with_lines(["Text      "]);

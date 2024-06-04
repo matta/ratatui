@@ -90,9 +90,9 @@ impl<'a> Button<'a> {
     }
 }
 
-impl<'a> Widget for Button<'a> {
+impl Button<'_> {
     #[allow(clippy::cast_possible_truncation)]
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn render(&self, area: Rect, buf: &mut Buffer) {
         let (background, text, shadow, highlight) = self.colors();
         buf.set_style(area, Style::new().bg(background).fg(text));
 
@@ -122,9 +122,7 @@ impl<'a> Widget for Button<'a> {
             area.width,
         );
     }
-}
 
-impl Button<'_> {
     const fn colors(&self) -> (Color, Color, Color, Color) {
         let theme = self.theme;
         match self.state {
@@ -197,12 +195,9 @@ fn ui(frame: &mut Frame, states: [State; 3]) {
     ]);
     let [title, buttons, help, _] = vertical.areas(frame.size());
 
-    frame.render_widget(
-        Paragraph::new("Custom Widget Example (mouse enabled)"),
-        title,
-    );
+    Paragraph::new("Custom Widget Example (mouse enabled)").render(title, frame.buffer_mut());
     render_buttons(frame, buttons, states);
-    frame.render_widget(Paragraph::new("←/→: select, Space: toggle, q: quit"), help);
+    Paragraph::new("←/→: select, Space: toggle, q: quit").render(help, frame.buffer_mut());
 }
 
 fn render_buttons(frame: &mut Frame<'_>, area: Rect, states: [State; 3]) {
@@ -214,9 +209,18 @@ fn render_buttons(frame: &mut Frame<'_>, area: Rect, states: [State; 3]) {
     ]);
     let [red, green, blue, _] = horizontal.areas(area);
 
-    frame.render_widget(Button::new("Red").theme(RED).state(states[0]), red);
-    frame.render_widget(Button::new("Green").theme(GREEN).state(states[1]), green);
-    frame.render_widget(Button::new("Blue").theme(BLUE).state(states[2]), blue);
+    Button::new("Red")
+        .theme(RED)
+        .state(states[0])
+        .render(red, frame.buffer_mut());
+    Button::new("Green")
+        .theme(GREEN)
+        .state(states[1])
+        .render(green, frame.buffer_mut());
+    Button::new("Blue")
+        .theme(BLUE)
+        .state(states[2])
+        .render(blue, frame.buffer_mut());
 }
 
 fn handle_key_event(

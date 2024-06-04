@@ -78,15 +78,13 @@ fn ui(frame: &mut Frame) {
     let [text_area, examples_area, _] = vertical.areas(frame.size());
 
     // title
-    frame.render_widget(
-        Paragraph::new(vec![
-            Line::from("Horizontal Layout Example. Press q to quit".dark_gray()).centered(),
-            Line::from("Each line has 2 constraints, plus Min(0) to fill the remaining space."),
-            Line::from("E.g. the second line of the Len/Min box is [Length(2), Min(2), Min(0)]"),
-            Line::from("Note: constraint labels that don't fit are truncated"),
-        ]),
-        text_area,
-    );
+    Paragraph::new(vec![
+        Line::from("Horizontal Layout Example. Press q to quit".dark_gray()).centered(),
+        Line::from("Each line has 2 constraints, plus Min(0) to fill the remaining space."),
+        Line::from("E.g. the second line of the Len/Min box is [Length(2), Min(2), Min(0)]"),
+        Line::from("Note: constraint labels that don't fit are truncated"),
+    ])
+    .render(text_area, frame.buffer_mut());
 
     let example_rows = Layout::vertical([
         Length(9),
@@ -195,14 +193,14 @@ fn render_example_combination(
         .style(Style::reset())
         .border_style(Style::default().fg(Color::DarkGray));
     let inner = block.inner(area);
-    frame.render_widget(block, area);
+    block.render(area, frame.buffer_mut());
     let layout = Layout::vertical(vec![Length(1); constraints.len() + 1]).split(inner);
     for (i, (a, b)) in constraints.into_iter().enumerate() {
         render_single_example(frame, layout[i], vec![a, b, Min(0)]);
     }
     // This is to make it easy to visually see the alignment of the examples
     // with the constraints.
-    frame.render_widget(Paragraph::new("123456789012"), layout[6]);
+    Paragraph::new("123456789012").render(layout[6], frame.buffer_mut());
 }
 
 /// Renders a single example line
@@ -212,9 +210,9 @@ fn render_single_example(frame: &mut Frame, area: Rect, constraints: Vec<Constra
     let green = Paragraph::new("·".repeat(12)).on_green();
     let horizontal = Layout::horizontal(constraints);
     let [r, b, g] = horizontal.areas(area);
-    frame.render_widget(red, r);
-    frame.render_widget(blue, b);
-    frame.render_widget(green, g);
+    red.render(r, frame.buffer_mut());
+    blue.render(b, frame.buffer_mut());
+    green.render(g, frame.buffer_mut());
 }
 
 fn constraint_label(constraint: Constraint) -> String {

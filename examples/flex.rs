@@ -172,7 +172,7 @@ impl App {
     }
 
     fn draw(self, terminal: &mut Terminal<impl Backend>) -> io::Result<()> {
-        terminal.draw(|frame| frame.render_widget(self, frame.size()))?;
+        terminal.draw(|frame| self.render(frame.size(), frame.buffer_mut()))?;
         Ok(())
     }
 
@@ -254,23 +254,8 @@ fn example_height() -> u16 {
         .sum()
 }
 
-impl Widget for App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let layout = Layout::vertical([Length(3), Length(1), Fill(0)]);
-        let [tabs, axis, demo] = layout.areas(area);
-        self.tabs().render(tabs, buf);
-        let scroll_needed = self.render_demo(demo, buf);
-        let axis_width = if scroll_needed {
-            axis.width.saturating_sub(1)
-        } else {
-            axis.width
-        };
-        Self::axis(axis_width, self.spacing).render(axis, buf);
-    }
-}
-
 impl App {
-    fn tabs(self) -> impl Widget {
+    fn tabs(self) -> Tabs<'static> {
         let tab_titles = SelectedTab::iter().map(SelectedTab::to_tab_title);
         let block = Block::new()
             .title(Title::from("Flex Layouts ".bold()))
@@ -284,7 +269,7 @@ impl App {
     }
 
     /// a bar like `<----- 80 px (gap: 2 px)? ----->`
-    fn axis(width: u16, spacing: u16) -> impl Widget {
+    fn axis(width: u16, spacing: u16) -> Paragraph<'static> {
         let width = width as usize;
         // only show gap when spacing is not zero
         let label = if spacing != 0 {
@@ -345,6 +330,19 @@ impl App {
         }
         scrollbar_needed
     }
+
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        let layout = Layout::vertical([Length(3), Length(1), Fill(0)]);
+        let [tabs, axis, demo] = layout.areas(area);
+        self.tabs().render(tabs, buf);
+        let scroll_needed = self.render_demo(demo, buf);
+        let axis_width = if scroll_needed {
+            axis.width.saturating_sub(1)
+        } else {
+            axis.width
+        };
+        Self::axis(axis_width, self.spacing).render(axis, buf);
+    }
 }
 
 impl SelectedTab {
@@ -376,11 +374,8 @@ impl SelectedTab {
         };
         format!(" {text} ").fg(color).bg(Color::Black).into()
     }
-}
 
-impl StatefulWidget for SelectedTab {
-    type State = u16;
-    fn render(self, area: Rect, buf: &mut Buffer, spacing: &mut Self::State) {
+    fn render(self, area: Rect, buf: &mut Buffer, spacing: &mut u16) {
         let spacing = *spacing;
         match self {
             Self::Legacy => Self::render_examples(area, buf, Flex::Legacy, spacing),
@@ -416,7 +411,7 @@ impl Example {
     }
 }
 
-impl Widget for Example {
+impl Example {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title_height = get_description_height(&self.description);
         let layout = Layout::vertical([Length(title_height), Fill(0)]);
@@ -446,9 +441,7 @@ impl Widget for Example {
             Self::render_spacer(*spacer, buf);
         }
     }
-}
 
-impl Example {
     fn render_spacer(spacer: Rect, buf: &mut Buffer) {
         if spacer.width > 1 {
             let corners_only = symbols::border::Set {
@@ -494,7 +487,7 @@ impl Example {
             .render(spacer, buf);
     }
 
-    fn illustration(constraint: Constraint, width: u16) -> impl Widget {
+    fn illustration(constraint: Constraint, width: u16) -> Paragraph<'static> {
         let main_color = color_for_constraint(constraint);
         let fg_color = Color::White;
         let title = format!("{constraint}");

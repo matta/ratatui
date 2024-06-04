@@ -19,13 +19,13 @@ fn backend_termion_should_only_write_diffs() -> Result<(), Box<dyn std::error::E
             },
         )?;
         terminal.draw(|f| {
-            f.render_widget(Paragraph::new("a"), area);
+            Paragraph::new("a").render(area, f.buffer_mut());
         })?;
         terminal.draw(|f| {
-            f.render_widget(Paragraph::new("ab"), area);
+            Paragraph::new("ab").render(area, f.buffer_mut());
         })?;
         terminal.draw(|f| {
-            f.render_widget(Paragraph::new("abc"), area);
+            Paragraph::new("abc").render(area, f.buffer_mut());
         })?;
     }
 

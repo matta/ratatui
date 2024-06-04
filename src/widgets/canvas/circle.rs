@@ -36,10 +36,7 @@ mod tests {
         layout::Rect,
         style::Color,
         symbols::Marker,
-        widgets::{
-            canvas::{Canvas, Circle},
-            Widget,
-        },
+        widgets::canvas::{Canvas, Circle},
     };
 
     #[test]

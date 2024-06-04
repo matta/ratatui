@@ -169,30 +169,8 @@ impl App {
     }
 
     fn draw(&mut self, terminal: &mut Terminal<impl Backend>) -> io::Result<()> {
-        terminal.draw(|f| f.render_widget(self, f.size()))?;
+        terminal.draw(|f| self.render(f.size(), f.buffer_mut()))?;
         Ok(())
-    }
-}
-
-impl Widget for &mut App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        // Create a space for header, todo list and the footer.
-        let vertical = Layout::vertical([
-            Constraint::Length(2),
-            Constraint::Min(0),
-            Constraint::Length(2),
-        ]);
-        let [header_area, rest_area, footer_area] = vertical.areas(area);
-
-        // Create two chunks with equal vertical screen space. One for the list and the other for
-        // the info block.
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let [upper_item_list_area, lower_item_list_area] = vertical.areas(rest_area);
-
-        render_title(header_area, buf);
-        self.render_todo(upper_item_list_area, buf);
-        self.render_info(lower_item_list_area, buf);
-        render_footer(footer_area, buf);
     }
 }
 
@@ -241,7 +219,7 @@ impl App {
         // We can now render the item list
         // (look careful we are using StatefulWidget's render.)
         // ratatui::widgets::StatefulWidget::render as stateful_render
-        StatefulWidget::render(items, inner_area, buf, &mut self.items.state);
+        items.render_ref(inner_area, buf, &mut self.items.state);
     }
 
     fn render_info(&self, area: Rect, buf: &mut Buffer) {
@@ -282,6 +260,26 @@ impl App {
 
         // We can now render the item info
         info_paragraph.render(inner_info_area, buf);
+    }
+
+    fn render(&mut self, area: Rect, buf: &mut Buffer) {
+        // Create a space for header, todo list and the footer.
+        let vertical = Layout::vertical([
+            Constraint::Length(2),
+            Constraint::Min(0),
+            Constraint::Length(2),
+        ]);
+        let [header_area, rest_area, footer_area] = vertical.areas(area);
+
+        // Create two chunks with equal vertical screen space. One for the list and the other for
+        // the info block.
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+        let [upper_item_list_area, lower_item_list_area] = vertical.areas(rest_area);
+
+        render_title(header_area, buf);
+        self.render_todo(upper_item_list_area, buf);
+        self.render_info(lower_item_list_area, buf);
+        render_footer(footer_area, buf);
     }
 }
 

@@ -231,7 +231,7 @@ fn ui(f: &mut Frame, app: &App) {
     };
     let text = Text::from(Line::from(msg)).patch_style(style);
     let help_message = Paragraph::new(text);
-    f.render_widget(help_message, help_area);
+    help_message.render(help_area, f.buffer_mut());
 
     let input = Paragraph::new(app.input.as_str())
         .style(match app.input_mode {
@@ -239,7 +239,7 @@ fn ui(f: &mut Frame, app: &App) {
             InputMode::Editing => Style::default().fg(Color::Yellow),
         })
         .block(Block::bordered().title("Input"));
-    f.render_widget(input, input_area);
+    input.render(input_area, f.buffer_mut());
     match app.input_mode {
         InputMode::Normal =>
             // Hide the cursor. `Frame` does this by default, so we don't need to do anything here
@@ -269,5 +269,5 @@ fn ui(f: &mut Frame, app: &App) {
         })
         .collect();
     let messages = List::new(messages).block(Block::bordered().title("Messages"));
-    f.render_widget(messages, messages_area);
+    messages.render_without_state(messages_area, f.buffer_mut());
 }

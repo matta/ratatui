@@ -389,6 +389,23 @@ impl<'a> Scrollbar<'a> {
         self.end_style = style;
         self
     }
+
+    /// FIXME: write docs
+    pub fn render(&self, area: Rect, buf: &mut Buffer, state: &mut ScrollbarState) {
+        if state.content_length == 0 || self.track_length_excluding_arrow_heads(area) == 0 {
+            return;
+        }
+
+        let mut bar = self.bar_symbols(area, state);
+        let area = self.scollbar_area(area);
+        for x in area.left()..area.right() {
+            for y in area.top()..area.bottom() {
+                if let Some(Some((symbol, style))) = bar.next() {
+                    buf.set_string(x, y, symbol, style);
+                }
+            }
+        }
+    }
 }
 
 impl Default for ScrollbarState {
@@ -474,26 +491,6 @@ impl ScrollbarState {
             }
             ScrollDirection::Backward => {
                 self.prev();
-            }
-        }
-    }
-}
-
-impl<'a> StatefulWidget for Scrollbar<'a> {
-    type State = ScrollbarState;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        if state.content_length == 0 || self.track_length_excluding_arrow_heads(area) == 0 {
-            return;
-        }
-
-        let mut bar = self.bar_symbols(area, state);
-        let area = self.scollbar_area(area);
-        for x in area.left()..area.right() {
-            for y in area.top()..area.bottom() {
-                if let Some(Some((symbol, style))) = bar.next() {
-                    buf.set_string(x, y, symbol, style);
-                }
             }
         }
     }

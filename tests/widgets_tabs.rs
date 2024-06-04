@@ -15,14 +15,14 @@ fn widgets_tabs_should_not_panic_on_narrow_areas() {
     terminal
         .draw(|f| {
             let tabs = Tabs::new(["Tab1", "Tab2"]);
-            f.render_widget(
-                tabs,
+            tabs.render(
                 Rect {
                     x: 0,
                     y: 0,
                     width: 1,
                     height: 1,
                 },
+                f.buffer_mut(),
             );
         })
         .unwrap();
@@ -36,14 +36,14 @@ fn widgets_tabs_should_truncate_the_last_item() {
     terminal
         .draw(|f| {
             let tabs = Tabs::new(["Tab1", "Tab2"]);
-            f.render_widget(
-                tabs,
+            tabs.render(
                 Rect {
                     x: 0,
                     y: 0,
                     width: 9,
                     height: 1,
                 },
+                f.buffer_mut(),
             );
         })
         .unwrap();

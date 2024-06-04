@@ -3,20 +3,22 @@ use ratatui::{
     backend::TestBackend,
     buffer::Buffer,
     style::Style,
-    widgets::{
-        calendar::{CalendarEventStore, Monthly},
-        Widget,
-    },
+    widgets::calendar::{CalendarEventStore, Monthly},
     Terminal,
 };
 use time::{Date, Month};
 
 #[track_caller]
-fn test_render<W: Widget>(widget: W, width: u16, height: u16, expected: &Buffer) {
+fn test_render(
+    widget: &Monthly<'_, CalendarEventStore>,
+    width: u16,
+    height: u16,
+    expected: &Buffer,
+) {
     let backend = TestBackend::new(width, height);
     let mut terminal = Terminal::new(backend).unwrap();
     terminal
-        .draw(|f| f.render_widget(widget, f.size()))
+        .draw(|f| widget.render(f.size(), f.buffer_mut()))
         .unwrap();
     terminal.backend().assert_buffer(expected);
 }
@@ -34,7 +36,7 @@ fn days_layout() {
         " 22 23 24 25 26 27 28",
         " 29 30 31",
     ]);
-    test_render(c, 21, 5, &expected);
+    test_render(&c, 21, 5, &expected);
 }
 
 #[test]
@@ -52,7 +54,7 @@ fn days_layout_show_surrounding() {
         " 24 25 26 27 28 29 30",
         " 31  1  2  3  4  5  6",
     ]);
-    test_render(c, 21, 6, &expected);
+    test_render(&c, 21, 6, &expected);
 }
 
 #[test]
@@ -70,7 +72,7 @@ fn show_month_header() {
         " 22 23 24 25 26 27 28",
         " 29 30 31",
     ]);
-    test_render(c, 21, 6, &expected);
+    test_render(&c, 21, 6, &expected);
 }
 
 #[test]
@@ -88,7 +90,7 @@ fn show_weekdays_header() {
         " 22 23 24 25 26 27 28",
         " 29 30 31",
     ]);
-    test_render(c, 21, 6, &expected);
+    test_render(&c, 21, 6, &expected);
 }
 
 #[test]
@@ -109,5 +111,5 @@ fn show_combo() {
         " 22 23 24 25 26 27 28",
         " 29 30 31  1  2  3  4",
     ]);
-    test_render(c, 21, 7, &expected);
+    test_render(&c, 21, 7, &expected);
 }

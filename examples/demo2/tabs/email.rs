@@ -54,10 +54,8 @@ impl EmailTab {
     pub fn next(&mut self) {
         self.row_index = self.row_index.saturating_add(1) % EMAILS.len();
     }
-}
 
-impl Widget for EmailTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    pub fn render(self, area: Rect, buf: &mut Buffer) {
         RgbSwatch.render(area, buf);
         let area = area.inner(&Margin {
             vertical: 1,
@@ -95,15 +93,11 @@ fn render_inbox(selected_index: usize, area: Rect, buf: &mut Buffer) {
         })
         .collect_vec();
     let mut state = ListState::default().with_selected(Some(selected_index));
-    StatefulWidget::render(
-        List::new(items)
-            .style(theme.inbox)
-            .highlight_style(theme.selected_item)
-            .highlight_symbol(highlight_symbol),
-        inbox,
-        buf,
-        &mut state,
-    );
+    List::new(items)
+        .style(theme.inbox)
+        .highlight_style(theme.selected_item)
+        .highlight_symbol(highlight_symbol)
+        .render_ref(inbox, buf, &mut state);
     let mut scrollbar_state = ScrollbarState::default()
         .content_length(EMAILS.len())
         .position(selected_index);

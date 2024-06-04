@@ -20,7 +20,7 @@ fn widgets_barchart_not_full_below_max_value() {
                 .max(100)
                 .bar_width(7)
                 .bar_gap(0);
-            f.render_widget(barchart, size);
+            barchart.render(size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([
@@ -66,7 +66,7 @@ fn widgets_barchart_group() {
                 .group_gap(2)
                 .bar_width(4)
                 .bar_gap(1);
-            f.render_widget(barchart, size);
+            barchart.render(size, f.buffer_mut());
         })
         .unwrap();
 

@@ -102,7 +102,7 @@ impl App {
     }
 
     fn draw(self, terminal: &mut Terminal<impl Backend>) -> io::Result<()> {
-        terminal.draw(|frame| frame.render_widget(self, frame.size()))?;
+        terminal.draw(|frame| self.render(frame.size(), frame.buffer_mut()))?;
         Ok(())
     }
 
@@ -159,16 +159,6 @@ impl App {
 
     fn bottom(&mut self) {
         self.scroll_offset = self.max_scroll_offset;
-    }
-}
-
-impl Widget for App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let [tabs, axis, demo] = Layout::vertical([Length(3), Length(3), Fill(0)]).areas(area);
-
-        self.render_tabs(tabs, buf);
-        Self::render_axis(axis, buf);
-        self.render_demo(demo, buf);
     }
 }
 
@@ -247,6 +237,14 @@ impl App {
             Scrollbar::new(ScrollbarOrientation::VerticalRight).render(area, buf, &mut state);
         }
     }
+
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        let [tabs, axis, demo] = Layout::vertical([Length(3), Length(3), Fill(0)]).areas(area);
+
+        self.render_tabs(tabs, buf);
+        Self::render_axis(axis, buf);
+        self.render_demo(demo, buf);
+    }
 }
 
 impl SelectedTab {
@@ -287,19 +285,6 @@ impl SelectedTab {
             Self::Max => MAX_COLOR,
         };
         text.fg(tailwind::SLATE.c200).bg(color).into()
-    }
-}
-
-impl Widget for SelectedTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        match self {
-            Self::Length => Self::render_length_example(area, buf),
-            Self::Percentage => Self::render_percentage_example(area, buf),
-            Self::Ratio => Self::render_ratio_example(area, buf),
-            Self::Fill => Self::render_fill_example(area, buf),
-            Self::Min => Self::render_min_example(area, buf),
-            Self::Max => Self::render_max_example(area, buf),
-        }
     }
 }
 
@@ -362,6 +347,17 @@ impl SelectedTab {
         Example::new(&[Percentage(0), Max(60)]).render(example4, buf);
         Example::new(&[Percentage(0), Max(80)]).render(example5, buf);
     }
+
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        match self {
+            Self::Length => Self::render_length_example(area, buf),
+            Self::Percentage => Self::render_percentage_example(area, buf),
+            Self::Ratio => Self::render_ratio_example(area, buf),
+            Self::Fill => Self::render_fill_example(area, buf),
+            Self::Min => Self::render_min_example(area, buf),
+            Self::Max => Self::render_max_example(area, buf),
+        }
+    }
 }
 
 struct Example {
@@ -376,20 +372,8 @@ impl Example {
     }
 }
 
-impl Widget for Example {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let [area, _] =
-            Layout::vertical([Length(ILLUSTRATION_HEIGHT), Length(SPACER_HEIGHT)]).areas(area);
-        let blocks = Layout::horizontal(&self.constraints).split(area);
-
-        for (block, constraint) in blocks.iter().zip(&self.constraints) {
-            Self::illustration(*constraint, block.width).render(*block, buf);
-        }
-    }
-}
-
 impl Example {
-    fn illustration(constraint: Constraint, width: u16) -> impl Widget {
+    fn illustration(constraint: Constraint, width: u16) -> Paragraph<'static> {
         let color = match constraint {
             Constraint::Length(_) => LENGTH_COLOR,
             Constraint::Percentage(_) => PERCENTAGE_COLOR,
@@ -407,6 +391,16 @@ impl Example {
             .border_style(Style::reset().fg(color).reversed())
             .style(Style::default().fg(fg).bg(color));
         Paragraph::new(text).centered().block(block)
+    }
+
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        let [area, _] =
+            Layout::vertical([Length(ILLUSTRATION_HEIGHT), Length(SPACER_HEIGHT)]).areas(area);
+        let blocks = Layout::horizontal(&self.constraints).split(area);
+
+        for (block, constraint) in blocks.iter().zip(&self.constraints) {
+            Self::illustration(*constraint, block.width).render(*block, buf);
+        }
     }
 }
 

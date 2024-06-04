@@ -561,6 +561,17 @@ impl<'a> Block<'a> {
         self.padding = padding;
         self
     }
+
+    /// FIXME: write docs
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
+        let area = area.intersection(buf.area);
+        if area.is_empty() {
+            return;
+        }
+        buf.set_style(area, self.style);
+        self.render_borders(area, buf);
+        self.render_titles(area, buf);
+    }
 }
 
 impl BorderType {
@@ -579,24 +590,6 @@ impl BorderType {
     /// Convert this `BorderType` into the corresponding [`Set`](border::Set) of border symbols.
     pub const fn to_border_set(self) -> border::Set {
         Self::border_symbols(self)
-    }
-}
-
-impl Widget for Block<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Block<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let area = area.intersection(buf.area);
-        if area.is_empty() {
-            return;
-        }
-        buf.set_style(area, self.style);
-        self.render_borders(area, buf);
-        self.render_titles(area, buf);
     }
 }
 
@@ -725,7 +718,7 @@ impl Block<'_> {
                 ..titles_area
             };
             buf.set_style(title_area, self.titles_style);
-            title.content.render_ref(title_area, buf);
+            title.content.render(title_area, buf);
 
             // bump the width of the titles area to the left
             titles_area.width = titles_area
@@ -766,7 +759,7 @@ impl Block<'_> {
                 ..titles_area
             };
             buf.set_style(title_area, self.titles_style);
-            title.content.render_ref(title_area, buf);
+            title.content.render(title_area, buf);
 
             // bump the titles area to the right and reduce its width
             titles_area.x = titles_area.x.saturating_add(title_width + 1);
@@ -789,7 +782,7 @@ impl Block<'_> {
                 ..titles_area
             };
             buf.set_style(title_area, self.titles_style);
-            title.content.render_ref(title_area, buf);
+            title.content.render(title_area, buf);
 
             // bump the titles area to the right and reduce its width
             titles_area.x = titles_area.x.saturating_add(title_width + 1);

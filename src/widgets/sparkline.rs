@@ -138,6 +138,15 @@ impl<'a> Sparkline<'a> {
         self.direction = direction;
         self
     }
+
+    /// FIXME: writeme
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
+        if let Some(ref block) = self.block {
+            block.render(area, buf);
+        }
+        let inner = self.block.inner_if_some(area);
+        self.render_sparkline(inner, buf);
+    }
 }
 
 impl<'a> Styled for Sparkline<'a> {
@@ -149,20 +158,6 @@ impl<'a> Styled for Sparkline<'a> {
 
     fn set_style<S: Into<Style>>(self, style: S) -> Self::Item {
         self.style(style)
-    }
-}
-
-impl Widget for Sparkline<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Sparkline<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        self.block.render_ref(area, buf);
-        let inner = self.block.inner_if_some(area);
-        self.render_sparkline(inner, buf);
     }
 }
 
@@ -251,7 +246,7 @@ mod tests {
 
     // Helper function to render a sparkline to a buffer with a given width
     // filled with x symbols to make it easier to assert on the result
-    fn render(widget: Sparkline, width: u16) -> Buffer {
+    fn render(widget: &Sparkline, width: u16) -> Buffer {
         let area = Rect::new(0, 0, width, 1);
         let mut cell = Cell::default();
         cell.set_symbol("x");
@@ -263,21 +258,21 @@ mod tests {
     #[test]
     fn it_does_not_panic_if_max_is_zero() {
         let widget = Sparkline::default().data(&[0, 0, 0]);
-        let buffer = render(widget, 6);
+        let buffer = render(&widget, 6);
         assert_eq!(buffer, Buffer::with_lines(["   xxx"]));
     }
 
     #[test]
     fn it_does_not_panic_if_max_is_set_to_zero() {
         let widget = Sparkline::default().data(&[0, 1, 2]).max(0);
-        let buffer = render(widget, 6);
+        let buffer = render(&widget, 6);
         assert_eq!(buffer, Buffer::with_lines(["   xxx"]));
     }
 
     #[test]
     fn it_draws() {
         let widget = Sparkline::default().data(&[0, 1, 2, 3, 4, 5, 6, 7, 8]);
-        let buffer = render(widget, 12);
+        let buffer = render(&widget, 12);
         assert_eq!(buffer, Buffer::with_lines([" ▁▂▃▄▅▆▇█xxx"]));
     }
 
@@ -286,7 +281,7 @@ mod tests {
         let widget = Sparkline::default()
             .data(&[0, 1, 2, 3, 4, 5, 6, 7, 8])
             .direction(RenderDirection::LeftToRight);
-        let buffer = render(widget, 12);
+        let buffer = render(&widget, 12);
         assert_eq!(buffer, Buffer::with_lines([" ▁▂▃▄▅▆▇█xxx"]));
     }
 
@@ -295,7 +290,7 @@ mod tests {
         let widget = Sparkline::default()
             .data(&[0, 1, 2, 3, 4, 5, 6, 7, 8])
             .direction(RenderDirection::RightToLeft);
-        let buffer = render(widget, 12);
+        let buffer = render(&widget, 12);
         assert_eq!(buffer, Buffer::with_lines(["xxx█▇▆▅▄▃▂▁ "]));
     }
 

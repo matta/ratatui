@@ -134,8 +134,8 @@ pub struct BigText<'a> {
     pixel_size: PixelSize,
 }
 
-impl Widget for BigText<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+impl BigText<'_> {
+    pub fn render(self, area: Rect, buf: &mut Buffer) {
         let layout = layout(area, self.pixel_size);
         for (line, line_layout) in self.lines.iter().zip(layout) {
             for (g, cell) in line.styled_graphemes(self.style).zip(line_layout) {

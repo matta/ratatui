@@ -157,7 +157,7 @@ fn ui(f: &mut Frame, app: &App) {
         )
         .data(&app.data1)
         .style(Style::default().fg(Color::Yellow));
-    f.render_widget(sparkline, chunks[0]);
+    sparkline.render(chunks[0], f.buffer_mut());
     let sparkline = Sparkline::default()
         .block(
             Block::new()
@@ -166,7 +166,7 @@ fn ui(f: &mut Frame, app: &App) {
         )
         .data(&app.data2)
         .style(Style::default().bg(Color::Green));
-    f.render_widget(sparkline, chunks[1]);
+    sparkline.render(chunks[1], f.buffer_mut());
     // Multiline
     let sparkline = Sparkline::default()
         .block(
@@ -176,5 +176,5 @@ fn ui(f: &mut Frame, app: &App) {
         )
         .data(&app.data3)
         .style(Style::default().fg(Color::Red));
-    f.render_widget(sparkline, chunks[2]);
+    sparkline.render(chunks[2], f.buffer_mut());
 }

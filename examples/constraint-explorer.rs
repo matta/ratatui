@@ -118,7 +118,7 @@ impl App {
     }
 
     fn draw(&self, terminal: &mut Terminal<impl Backend>) -> io::Result<()> {
-        terminal.draw(|frame| frame.render_widget(self, frame.size()))?;
+        terminal.draw(|frame| self.render(frame.size(), frame.buffer_mut()))?;
         Ok(())
     }
 
@@ -255,37 +255,18 @@ impl From<Constraint> for ConstraintName {
     }
 }
 
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let [header_area, instructions_area, swap_legend_area, _, blocks_area] =
-            Layout::vertical([
-                Length(2), // header
-                Length(2), // instructions
-                Length(1), // swap key legend
-                Length(1), // gap
-                Fill(1),   // blocks
-            ])
-            .areas(area);
-
-        App::header().render(header_area, buf);
-        App::instructions().render(instructions_area, buf);
-        App::swap_legend().render(swap_legend_area, buf);
-        self.render_layout_blocks(blocks_area, buf);
-    }
-}
-
 // App rendering
 impl App {
     const HEADER_COLOR: Color = SLATE.c200;
     const TEXT_COLOR: Color = SLATE.c400;
     const AXIS_COLOR: Color = SLATE.c500;
 
-    fn header() -> impl Widget {
+    fn header() -> Line<'static> {
         let text = "Constraint Explorer";
         text.bold().fg(Self::HEADER_COLOR).into_centered_line()
     }
 
-    fn instructions() -> impl Widget {
+    fn instructions() -> Paragraph<'static> {
         let text = "◄ ►: select, ▲ ▼: edit, 1-6: swap, a: add, x: delete, q: quit, + -: spacing";
         Paragraph::new(text)
             .fg(Self::TEXT_COLOR)
@@ -293,7 +274,7 @@ impl App {
             .wrap(Wrap { trim: false })
     }
 
-    fn swap_legend() -> impl Widget {
+    fn swap_legend() -> Paragraph<'static> {
         #[allow(unstable_name_collisions)]
         Paragraph::new(
             Line::from(
@@ -323,7 +304,7 @@ impl App {
     /// A bar like `<----- 80 px (gap: 2 px) ----->`
     ///
     /// Only shows the gap when spacing is not zero
-    fn axis(&self, width: u16) -> impl Widget {
+    fn axis(&self, width: u16) -> Paragraph<'static> {
         let label = if self.spacing != 0 {
             format!("{} px (gap: {} px)", width, self.spacing)
         } else {
@@ -387,18 +368,25 @@ impl App {
         }
 
         for area in spacers.iter() {
-            SpacerBlock.render(*area, buf);
+            SpacerBlock::render(*area, buf);
         }
     }
-}
 
-impl Widget for ConstraintBlock {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        match area.height {
-            1 => self.render_1px(area, buf),
-            2 => self.render_2px(area, buf),
-            _ => self.render_4px(area, buf),
-        }
+    fn render(&self, area: Rect, buf: &mut Buffer) {
+        let [header_area, instructions_area, swap_legend_area, _, blocks_area] =
+            Layout::vertical([
+                Length(2), // header
+                Length(2), // instructions
+                Length(1), // swap key legend
+                Length(1), // gap
+                Fill(1),   // blocks
+            ])
+            .areas(area);
+
+        Self::header().render(header_area, buf);
+        Self::instructions().render(instructions_area, buf);
+        Self::swap_legend().render(swap_legend_area, buf);
+        self.render_layout_blocks(blocks_area, buf);
     }
 }
 
@@ -493,15 +481,12 @@ impl ConstraintBlock {
             }
         }
     }
-}
 
-impl Widget for SpacerBlock {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn render(&self, area: Rect, buf: &mut Buffer) {
         match area.height {
-            1 => (),
-            2 => Self::render_2px(area, buf),
-            3 => Self::render_3px(area, buf),
-            _ => Self::render_4px(area, buf),
+            1 => self.render_1px(area, buf),
+            2 => self.render_2px(area, buf),
+            _ => self.render_4px(area, buf),
         }
     }
 }
@@ -511,7 +496,7 @@ impl SpacerBlock {
     const BORDER_COLOR: Color = SLATE.c600;
 
     /// A block with a corner borders
-    fn block() -> impl Widget {
+    fn block() -> Block<'static> {
         let corners_only = symbols::border::Set {
             top_left: line::NORMAL.top_left,
             top_right: line::NORMAL.top_right,
@@ -528,7 +513,7 @@ impl SpacerBlock {
     }
 
     /// A vertical line used if there is not enough space to render the block
-    fn line() -> impl Widget {
+    fn line() -> Paragraph<'static> {
         Paragraph::new(Text::from(vec![
             Line::from(""),
             Line::from("│"),
@@ -539,13 +524,13 @@ impl SpacerBlock {
     }
 
     /// A label that says "Spacer" if there is enough space
-    fn spacer_label(width: u16) -> impl Widget {
+    fn spacer_label(width: u16) -> Line<'static> {
         let label = if width >= 6 { "Spacer" } else { "" };
         label.fg(Self::TEXT_COLOR).into_centered_line()
     }
 
     /// A label that says "8 px" if there is enough space
-    fn label(width: u16) -> impl Widget {
+    fn label(width: u16) -> Line<'static> {
         let long_label = format!("{width} px");
         let short_label = format!("{width}");
         let label = if long_label.len() < width as usize {
@@ -589,6 +574,15 @@ impl SpacerBlock {
 
         let row = area.rows().nth(2).unwrap_or_default();
         Self::label(area.width).render(row, buf);
+    }
+
+    fn render(area: Rect, buf: &mut Buffer) {
+        match area.height {
+            1 => (),
+            2 => Self::render_2px(area, buf),
+            3 => Self::render_3px(area, buf),
+            _ => Self::render_4px(area, buf),
+        }
     }
 }
 

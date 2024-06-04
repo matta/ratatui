@@ -318,22 +318,17 @@ impl<'a> Paragraph<'a> {
     }
 }
 
-impl Widget for Paragraph<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Paragraph<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+impl Paragraph<'_> {
+    /// FIXME: writeme
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
-        self.block.render_ref(area, buf);
+        if let Some(ref block) = self.block {
+            block.render(area, buf);
+        }
         let inner = self.block.inner_if_some(area);
         self.render_paragraph(inner, buf);
     }
-}
 
-impl Paragraph<'_> {
     fn render_paragraph(&self, text_area: Rect, buf: &mut Buffer) {
         if text_area.is_empty() {
             return;
@@ -421,7 +416,7 @@ mod test {
         terminal
             .draw(|f| {
                 let size = f.size();
-                f.render_widget(paragraph.clone(), size);
+                paragraph.clone().render(size, f.buffer_mut());
             })
             .unwrap();
         terminal.backend().assert_buffer(expected);

@@ -62,11 +62,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
 fn ui(frame: &mut Frame) {
     let vertical = Layout::vertical([Constraint::Length(1), Constraint::Min(0)]);
     let [text_area, main_area] = vertical.areas(frame.size());
-    frame.render_widget(
-        Paragraph::new("Note: not all terminals support all modifiers")
-            .style(Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)),
-        text_area,
-    );
+    Paragraph::new("Note: not all terminals support all modifiers")
+        .style(Style::default().fg(Color::Red).add_modifier(Modifier::BOLD))
+        .render(text_area, frame.buffer_mut());
     let layout = Layout::vertical([Constraint::Length(1); 50])
         .split(main_area)
         .iter()
@@ -101,7 +99,7 @@ fn ui(frame: &mut Frame) {
                     // to bleed into the next character.
                     ".".black().on_black(),
                 ]));
-                frame.render_widget(paragraph, layout[index]);
+                paragraph.render(layout[index], frame.buffer_mut());
                 index += 1;
             }
         }

@@ -483,6 +483,30 @@ impl<'a> Text<'a> {
             self.lines.push(Line::from(span));
         }
     }
+
+    /// TODO: write docs
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
+        let area = area.intersection(buf.area);
+        buf.set_style(area, self.style);
+        for (line, row) in self.iter().zip(area.rows()) {
+            let line_width = line.width() as u16;
+
+            let x_offset = match (self.alignment, line.alignment) {
+                (Some(Alignment::Center), None) => area.width.saturating_sub(line_width) / 2,
+                (Some(Alignment::Right), None) => area.width.saturating_sub(line_width),
+                _ => 0,
+            };
+
+            let line_area = Rect {
+                x: area.x + x_offset,
+                y: row.y,
+                width: area.width - x_offset,
+                height: 1,
+            };
+
+            line.render(line_area, buf);
+        }
+    }
 }
 
 impl<'a> IntoIterator for Text<'a> {
@@ -590,37 +614,6 @@ impl fmt::Display for Text<'_> {
             }
         }
         Ok(())
-    }
-}
-
-impl Widget for Text<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Text<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let area = area.intersection(buf.area);
-        buf.set_style(area, self.style);
-        for (line, row) in self.iter().zip(area.rows()) {
-            let line_width = line.width() as u16;
-
-            let x_offset = match (self.alignment, line.alignment) {
-                (Some(Alignment::Center), None) => area.width.saturating_sub(line_width) / 2,
-                (Some(Alignment::Right), None) => area.width.saturating_sub(line_width),
-                _ => 0,
-            };
-
-            let line_area = Rect {
-                x: area.x + x_offset,
-                y: row.y,
-                width: area.width - x_offset,
-                height: 1,
-            };
-
-            line.render(line_area, buf);
-        }
     }
 }
 

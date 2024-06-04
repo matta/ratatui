@@ -59,7 +59,7 @@ impl App {
     fn draw(&self, terminal: &mut Terminal<impl Backend>) -> Result<()> {
         terminal
             .draw(|frame| {
-                frame.render_widget(self, frame.size());
+                self.render(frame.size(), frame.buffer_mut());
                 if self.mode == Mode::Destroy {
                     destroy::destroy(frame);
                 }
@@ -127,25 +127,6 @@ impl App {
     }
 }
 
-/// Implement Widget for &App rather than for App as we would otherwise have to clone or copy the
-/// entire app state on every frame. For this example, the app state is small enough that it doesn't
-/// matter, but for larger apps this can be a significant performance improvement.
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let vertical = Layout::vertical([
-            Constraint::Length(1),
-            Constraint::Min(0),
-            Constraint::Length(1),
-        ]);
-        let [title_bar, tab, bottom_bar] = vertical.areas(area);
-
-        Block::new().style(THEME.root).render(area, buf);
-        self.render_title_bar(title_bar, buf);
-        self.render_selected_tab(tab, buf);
-        App::render_bottom_bar(bottom_bar, buf);
-    }
-}
-
 impl App {
     fn render_title_bar(&self, area: Rect, buf: &mut Buffer) {
         let layout = Layout::horizontal([Constraint::Min(0), Constraint::Length(43)]);
@@ -193,6 +174,24 @@ impl App {
             .centered()
             .style((Color::Indexed(236), Color::Indexed(232)))
             .render(area, buf);
+    }
+
+    /// Implement for &App rather than for App as we would otherwise have to
+    /// clone or copy the entire app state on every frame. For this example, the
+    /// app state is small enough that it doesn't matter, but for larger apps
+    /// this can be a significant performance improvement.
+    fn render(&self, area: Rect, buf: &mut Buffer) {
+        let vertical = Layout::vertical([
+            Constraint::Length(1),
+            Constraint::Min(0),
+            Constraint::Length(1),
+        ]);
+        let [title_bar, tab, bottom_bar] = vertical.areas(area);
+
+        Block::new().style(THEME.root).render(area, buf);
+        self.render_title_bar(title_bar, buf);
+        self.render_selected_tab(tab, buf);
+        App::render_bottom_bar(bottom_bar, buf);
     }
 }
 

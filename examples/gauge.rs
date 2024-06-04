@@ -72,7 +72,7 @@ impl App {
     }
 
     fn draw(&self, terminal: &mut Terminal<impl Backend>) -> Result<()> {
-        terminal.draw(|f| f.render_widget(self, f.size()))?;
+        terminal.draw(|f| self.render(f.size(), f.buffer_mut()))?;
         Ok(())
     }
 
@@ -118,9 +118,7 @@ impl App {
     fn quit(&mut self) {
         self.state = AppState::Quitting;
     }
-}
 
-impl Widget for &App {
     #[allow(clippy::similar_names)]
     fn render(self, area: Rect, buf: &mut Buffer) {
         use Constraint::*;
