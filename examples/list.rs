@@ -241,7 +241,7 @@ impl App {
         // We can now render the item list
         // (look careful we are using StatefulWidget's render.)
         // ratatui::widgets::StatefulWidget::render as stateful_render
-        StatefulWidget::render(items, inner_area, buf, &mut self.items.state);
+        items.render_ref(inner_area, buf, &mut self.items.state);
     }
 
     fn render_info(&self, area: Rect, buf: &mut Buffer) {

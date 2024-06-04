@@ -67,7 +67,7 @@ where
             let list = List::new(items)
                 .highlight_symbol(">>")
                 .block(Block::new().borders(Borders::RIGHT));
-            StatefulWidget::render(list, layout[0], f.buffer_mut(), &mut state.list);
+            list.render_ref(layout[0], f.buffer_mut(), &mut state.list);
 
             let table = Table::new(
                 items.into_iter().map(|i| Row::new(vec![i])),
