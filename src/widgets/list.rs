@@ -920,7 +920,9 @@ impl StatefulWidgetRef for List<'_> {
 
     fn render_ref(&self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
         buf.set_style(area, self.style);
-        self.block.render_ref(area, buf);
+        if let Some(ref block) = self.block {
+            block.render_ref(area, buf);
+        }
         let list_area = self.block.inner_if_some(area);
 
         if list_area.is_empty() || self.items.is_empty() {

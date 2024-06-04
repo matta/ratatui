@@ -327,7 +327,9 @@ impl Widget for Paragraph<'_> {
 impl WidgetRef for Paragraph<'_> {
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
-        self.block.render_ref(area, buf);
+        if let Some(ref block) = self.block {
+            block.render_ref(area, buf);
+        }
         let inner = self.block.inner_if_some(area);
         self.render_paragraph(inner, buf);
     }

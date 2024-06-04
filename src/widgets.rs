@@ -311,48 +311,6 @@ impl<W: WidgetRef> Widget for &W {
     }
 }
 
-/// A blanket implementation of `WidgetExt` for `Option<W>` where `W` implements `WidgetRef`.
-///
-/// This is a convenience implementation that makes it easy to attach child widgets to parent
-/// widgets. It allows you to render an optional widget by reference.
-///
-/// The internal widgets use this pattern to render the optional `Block` widgets that are included
-/// on most widgets.
-/// Blanket implementation of `WidgetExt` for `Option<W>` where `W` implements `WidgetRef`.
-///
-/// # Examples
-///
-/// ```rust
-/// # #[cfg(feature = "unstable-widget-ref")] {
-/// use ratatui::{prelude::*, widgets::*};
-///
-/// struct Parent {
-///     child: Option<Child>,
-/// }
-///
-/// struct Child;
-///
-/// impl WidgetRef for Child {
-///     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-///         Line::raw("Hello from child").render(area, buf);
-///     }
-/// }
-///
-/// impl WidgetRef for Parent {
-///     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-///         self.child.render_ref(area, buf);
-///     }
-/// }
-/// # }
-/// ```
-impl<W: WidgetRef> WidgetRef for Option<W> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        if let Some(widget) = self {
-            widget.render_ref(area, buf);
-        }
-    }
-}
-
 /// A `StatefulWidgetRef` is a trait that allows rendering a stateful widget by reference.
 ///
 /// This is the stateful equivalent of `WidgetRef`. It is useful when you want to store a reference
@@ -615,32 +573,6 @@ mod tests {
         }
     }
 
-    mod option_widget_ref {
-        use super::*;
-
-        struct Greeting;
-
-        impl WidgetRef for Greeting {
-            fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-                Line::from("Hello").render(area, buf);
-            }
-        }
-
-        #[rstest]
-        fn render_ref_some(mut buf: Buffer) {
-            let widget = Some(Greeting);
-            widget.render_ref(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["Hello               "]));
-        }
-
-        #[rstest]
-        fn render_ref_none(mut buf: Buffer) {
-            let widget: Option<Greeting> = None;
-            widget.render_ref(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["                    "]));
-        }
-    }
-
     mod str {
         use super::*;
 
@@ -653,18 +585,6 @@ mod tests {
         #[rstest]
         fn render_ref(mut buf: Buffer) {
             "hello world".render_ref(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["hello world         "]));
-        }
-
-        #[rstest]
-        fn option_render(mut buf: Buffer) {
-            Some("hello world").render(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["hello world         "]));
-        }
-
-        #[rstest]
-        fn option_render_ref(mut buf: Buffer) {
-            Some("hello world").render_ref(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines(["hello world         "]));
         }
     }
@@ -680,18 +600,6 @@ mod tests {
         #[rstest]
         fn render_ref(mut buf: Buffer) {
             String::from("hello world").render_ref(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["hello world         "]));
-        }
-
-        #[rstest]
-        fn option_render(mut buf: Buffer) {
-            Some(String::from("hello world")).render(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["hello world         "]));
-        }
-
-        #[rstest]
-        fn option_render_ref(mut buf: Buffer) {
-            Some(String::from("hello world")).render_ref(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines(["hello world         "]));
         }
     }

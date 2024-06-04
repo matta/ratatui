@@ -737,7 +737,9 @@ where
     F: Fn(&mut Context),
 {
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        self.block.render_ref(area, buf);
+        if let Some(ref block) = self.block {
+            block.render_ref(area, buf);
+        }
         let canvas_area = self.block.inner_if_some(area);
         if canvas_area.is_empty() {
             return;

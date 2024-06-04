@@ -585,7 +585,9 @@ impl WidgetRef for BarChart<'_> {
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
 
-        self.block.render_ref(area, buf);
+        if let Some(ref block) = self.block {
+            block.render_ref(area, buf);
+        }
         let inner = self.block.inner_if_some(area);
 
         if inner.is_empty() || self.data.is_empty() || self.bar_width == 0 {
