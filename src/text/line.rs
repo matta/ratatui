@@ -472,6 +472,42 @@ impl<'a> Line<'a> {
     pub fn push_span<T: Into<Span<'a>>>(&mut self, span: T) {
         self.spans.push(span.into());
     }
+
+    /// FIXME: write docs
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
+        let area = area.intersection(buf.area);
+        if area.is_empty() {
+            return;
+        }
+        let line_width = self.width();
+        if line_width == 0 {
+            return;
+        }
+
+        buf.set_style(area, self.style);
+
+        let area_width = usize::from(area.width);
+        let can_render_complete_line = line_width <= area_width;
+        if can_render_complete_line {
+            let indent_width = match self.alignment {
+                Some(Alignment::Center) => (area_width.saturating_sub(line_width)) / 2,
+                Some(Alignment::Right) => area_width.saturating_sub(line_width),
+                Some(Alignment::Left) | None => 0,
+            };
+            let indent_width = u16::try_from(indent_width).unwrap_or(u16::MAX);
+            let area = area.indent_x(indent_width);
+            render_spans(&self.spans, area, buf, 0);
+        } else {
+            // There is not enough space to render the whole line. As the right side is truncated by
+            // the area width, only truncate the left.
+            let skip_width = match self.alignment {
+                Some(Alignment::Center) => (line_width.saturating_sub(area_width)) / 2,
+                Some(Alignment::Right) => line_width.saturating_sub(area_width),
+                Some(Alignment::Left) | None => 0,
+            };
+            render_spans(&self.spans, area, buf, skip_width);
+        };
+    }
 }
 
 impl<'a> IntoIterator for Line<'a> {
@@ -543,49 +579,6 @@ where
 {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         Self::from(iter.into_iter().map(Into::into).collect::<Vec<_>>())
-    }
-}
-
-impl Widget for Line<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Line<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let area = area.intersection(buf.area);
-        if area.is_empty() {
-            return;
-        }
-        let line_width = self.width();
-        if line_width == 0 {
-            return;
-        }
-
-        buf.set_style(area, self.style);
-
-        let area_width = usize::from(area.width);
-        let can_render_complete_line = line_width <= area_width;
-        if can_render_complete_line {
-            let indent_width = match self.alignment {
-                Some(Alignment::Center) => (area_width.saturating_sub(line_width)) / 2,
-                Some(Alignment::Right) => area_width.saturating_sub(line_width),
-                Some(Alignment::Left) | None => 0,
-            };
-            let indent_width = u16::try_from(indent_width).unwrap_or(u16::MAX);
-            let area = area.indent_x(indent_width);
-            render_spans(&self.spans, area, buf, 0);
-        } else {
-            // There is not enough space to render the whole line. As the right side is truncated by
-            // the area width, only truncate the left.
-            let skip_width = match self.alignment {
-                Some(Alignment::Center) => (line_width.saturating_sub(area_width)) / 2,
-                Some(Alignment::Right) => line_width.saturating_sub(area_width),
-                Some(Alignment::Left) | None => 0,
-            };
-            render_spans(&self.spans, area, buf, skip_width);
-        };
     }
 }
 
@@ -1063,7 +1056,7 @@ mod tests {
                 "🦀 RFC8628 OAuth 2.0 Device Authorization GrantでCLIからGithubのaccess tokenを取得する"
             );
             let mut buf = Buffer::empty(Rect::new(0, 0, 83, 1));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([
                 "🦀 RFC8628 OAuth 2.0 Device Authorization GrantでCLIからGithubのaccess tokenを取得 "
             ]));
@@ -1100,7 +1093,7 @@ mod tests {
         ) {
             let line = Line::from("1234🦀7890").alignment(alignment);
             let mut buf = Buffer::empty(Rect::new(0, 0, buf_width, 1));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
 
@@ -1153,7 +1146,7 @@ mod tests {
             };
             let line = Line::from(value).centered();
             let mut buf = Buffer::empty(Rect::new(0, 0, buf_width, 1));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
 
@@ -1171,7 +1164,7 @@ mod tests {
             // Fill buffer with stuff to ensure the output is indeed padded
             let mut buf = Buffer::filled(Rect::new(0, 0, 10, 1), Cell::default().set_symbol("X"));
             let area = Rect::new(2, 0, 6, 1);
-            line.render_ref(area, &mut buf);
+            line.render(area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
 
@@ -1189,7 +1182,7 @@ mod tests {
             let area = Rect::new(0, 0, buf_width, 1);
             // Fill buffer with stuff to ensure the output is indeed padded
             let mut buf = Buffer::filled(area, Cell::default().set_symbol("X"));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
 
@@ -1220,7 +1213,7 @@ mod tests {
         fn render_truncates_flag(#[case] buf_width: u16, #[case] expected: &str) {
             let line = Line::from("🇺🇸1234");
             let mut buf = Buffer::empty(Rect::new(0, 0, buf_width, 1));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
 
@@ -1244,7 +1237,7 @@ mod tests {
             assert!(line.width() >= min_width);
 
             let mut buf = Buffer::empty(Rect::new(0, 0, 32, 1));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
 
@@ -1268,7 +1261,7 @@ mod tests {
             assert!(line.width() >= min_width);
 
             let mut buf = Buffer::empty(Rect::new(0, 0, 32, 1));
-            line.render_ref(buf.area, &mut buf);
+            line.render(buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines([expected]));
         }
     }

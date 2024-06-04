@@ -280,7 +280,7 @@ impl App {
     const TEXT_COLOR: Color = SLATE.c400;
     const AXIS_COLOR: Color = SLATE.c500;
 
-    fn header() -> impl Widget {
+    fn header() -> Line<'static> {
         let text = "Constraint Explorer";
         text.bold().fg(Self::HEADER_COLOR).into_centered_line()
     }
@@ -539,13 +539,13 @@ impl SpacerBlock {
     }
 
     /// A label that says "Spacer" if there is enough space
-    fn spacer_label(width: u16) -> impl Widget {
+    fn spacer_label(width: u16) -> Line<'static> {
         let label = if width >= 6 { "Spacer" } else { "" };
         label.fg(Self::TEXT_COLOR).into_centered_line()
     }
 
     /// A label that says "8 px" if there is enough space
-    fn label(width: u16) -> impl Widget {
+    fn label(width: u16) -> Line<'static> {
         let long_label = format!("{width} px");
         let short_label = format!("{width}");
         let label = if long_label.len() < width as usize {
