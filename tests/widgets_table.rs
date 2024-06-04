@@ -6,7 +6,9 @@ use ratatui::{
     layout::Constraint,
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Cell, HighlightSpacing, Row, Table, TableState, Widget},
+    widgets::{
+        Block, Borders, Cell, HighlightSpacing, Row, StatefulWidget, Table, TableState, Widget,
+    },
     Terminal,
 };
 use rstest::rstest;
@@ -88,7 +90,7 @@ fn widgets_table_column_spacing_can_be_changed<'line, Lines>(
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(column_spacing);
-            table.render(size, f.buffer_mut());
+            Widget::render(table, size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -166,7 +168,7 @@ fn widgets_table_columns_widths_can_use_fixed_length_constraints<'line, Lines>(
             )
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered());
-            table.render(size, f.buffer_mut());
+            Widget::render(table, size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -257,7 +259,7 @@ fn widgets_table_columns_widths_can_use_percentage_constraints<'line, Lines>(
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(0);
-            table.render(size, f.buffer_mut());
+            Widget::render(table, size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -351,7 +353,7 @@ fn widgets_table_columns_widths_can_use_mixed_constraints<'line, Lines>(
             )
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered());
-            table.render(size, f.buffer_mut());
+            Widget::render(table, size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -438,7 +440,7 @@ fn widgets_table_columns_widths_can_use_ratio_constraints<'line, Lines>(
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(0);
-            table.render(size, f.buffer_mut());
+            Widget::render(table, size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -527,7 +529,7 @@ fn widgets_table_can_have_rows_with_multi_lines<'line, Lines>(
             .block(Block::bordered())
             .highlight_symbol(">> ")
             .column_spacing(1);
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -627,7 +629,7 @@ fn widgets_table_enable_always_highlight_spacing<'line, Lines>(
             .highlight_symbol(">> ")
             .highlight_spacing(space)
             .column_spacing(1);
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines(expected);
@@ -668,7 +670,7 @@ fn widgets_table_can_have_elements_styled_individually() {
             .highlight_symbol(">> ")
             .highlight_style(Style::default().add_modifier(Modifier::BOLD))
             .column_spacing(1);
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
 
@@ -731,7 +733,7 @@ fn widgets_table_should_render_even_if_empty() {
             .header(Row::new(vec!["Head1", "Head2", "Head3"]))
             .block(Block::new().borders(Borders::LEFT | Borders::RIGHT))
             .column_spacing(1);
-            table.render(size, f.buffer_mut());
+            Widget::render(table, size, f.buffer_mut());
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([
@@ -770,7 +772,7 @@ fn widgets_table_columns_dont_panic() {
     terminal
         .draw(|f| {
             let size = f.size();
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
 }
@@ -804,7 +806,7 @@ fn widgets_table_should_clamp_offset_if_rows_are_removed() {
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(1);
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([
@@ -834,7 +836,7 @@ fn widgets_table_should_clamp_offset_if_rows_are_removed() {
             .header(Row::new(vec!["Head1", "Head2", "Head3"]).bottom_margin(1))
             .block(Block::bordered())
             .column_spacing(1);
-            f.render_stateful_widget(table, size, &mut state);
+            StatefulWidget::render(table, size, f.buffer_mut(), &mut state);
         })
         .unwrap();
     terminal.backend().assert_buffer_lines([
