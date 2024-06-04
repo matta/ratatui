@@ -332,37 +332,9 @@ impl<'a> Span<'a> {
     pub fn to_right_aligned_line(self) -> Line<'a> {
         self.into_right_aligned_line()
     }
-}
 
-impl<'a, T> From<T> for Span<'a>
-where
-    T: Into<Cow<'a, str>>,
-{
-    fn from(s: T) -> Self {
-        Span::raw(s.into())
-    }
-}
-
-impl<'a> Styled for Span<'a> {
-    type Item = Self;
-
-    fn style(&self) -> Style {
-        self.style
-    }
-
-    fn set_style<S: Into<Style>>(self, style: S) -> Self::Item {
-        self.style(style)
-    }
-}
-
-impl Widget for Span<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Span<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// TODO: write docs.
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         let area = area.intersection(buf.area);
         let Rect {
             x: mut current_x,
@@ -392,6 +364,27 @@ impl WidgetRef for Span<'_> {
             }
             current_x = next_x;
         }
+    }
+}
+
+impl<'a, T> From<T> for Span<'a>
+where
+    T: Into<Cow<'a, str>>,
+{
+    fn from(s: T) -> Self {
+        Span::raw(s.into())
+    }
+}
+
+impl<'a> Styled for Span<'a> {
+    type Item = Self;
+
+    fn style(&self) -> Style {
+        self.style
+    }
+
+    fn set_style<S: Into<Style>>(self, style: S) -> Self::Item {
+        self.style(style)
     }
 }
 

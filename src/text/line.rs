@@ -589,7 +589,7 @@ fn render_spans(spans: &[Span], mut area: Rect, buf: &mut Buffer, span_skip_widt
         if area.is_empty() {
             break;
         }
-        span.render_ref(area, buf);
+        span.render(area, buf);
         let span_width = u16::try_from(span_width).unwrap_or(u16::MAX);
         area = area.indent_x(span_width);
     }
