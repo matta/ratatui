@@ -117,16 +117,9 @@ impl<'a, DS: DateStyler> Monthly<'a, DS> {
             }
         }
     }
-}
 
-impl<DS: DateStyler> Widget for Monthly<'_, DS> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl<DS: DateStyler> WidgetRef for Monthly<'_, DS> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// FIXME: write docs
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         if let Some(ref block) = self.block {
             block.render(area, buf);
         }
