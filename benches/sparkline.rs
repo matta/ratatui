@@ -1,10 +1,6 @@
 use criterion::{criterion_group, criterion_main, Bencher, BenchmarkId, Criterion};
 use rand::Rng;
-use ratatui::{
-    buffer::Buffer,
-    layout::Rect,
-    widgets::{Sparkline, Widget},
-};
+use ratatui::{buffer::Buffer, layout::Rect, widgets::Sparkline};
 
 /// Benchmark for rendering a sparkline.
 fn sparkline(c: &mut Criterion) {
