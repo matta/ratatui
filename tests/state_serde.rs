@@ -74,7 +74,7 @@ where
                 [Constraint::Length(10); 1],
             )
             .highlight_symbol(">>");
-            StatefulWidget::render(table, layout[1], f.buffer_mut(), &mut state.table);
+            table.render(layout[1], f.buffer_mut(), &mut state.table);
 
             let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
             scrollbar.render(layout[2], f.buffer_mut(), &mut state.scrollbar);

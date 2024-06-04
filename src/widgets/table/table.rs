@@ -563,7 +563,14 @@ impl<'a> Table<'a> {
         self
     }
 
-    fn render_ref(&self, area: Rect, buf: &mut Buffer, state: &mut TableState) {
+    /// FIXME: write docs
+    pub fn render_without_state(&self, area: Rect, buf: &mut Buffer) {
+        let mut state = TableState::default();
+        self.render(area, buf, &mut state);
+    }
+
+    /// FIXME: write docs
+    pub fn render(&self, area: Rect, buf: &mut Buffer, state: &mut TableState) {
         buf.set_style(area, self.style);
         if let Some(ref block) = self.block {
             block.render_ref(area, buf);
@@ -589,35 +596,6 @@ impl<'a> Table<'a> {
         );
 
         self.render_footer(footer_area, buf, &columns_widths);
-    }
-}
-
-impl Widget for Table<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        WidgetRef::render_ref(&self, area, buf);
-    }
-}
-
-impl WidgetRef for Table<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let mut state = TableState::default();
-        StatefulWidget::render(self, area, buf, &mut state);
-    }
-}
-
-impl StatefulWidget for Table<'_> {
-    type State = TableState;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        self.render_ref(area, buf, state);
-    }
-}
-
-// Note: remove this when StatefulWidgetRef is stabilized and replace with the blanket impl
-impl StatefulWidget for &Table<'_> {
-    type State = TableState;
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        self.render_ref(area, buf, state);
     }
 }
 
@@ -1005,7 +983,7 @@ mod tests {
             let mut buf = Buffer::empty(Rect::new(0, 0, 15, 3));
             let rows = vec![Row::new(vec!["Cell1", "Cell2"])];
             let table = Table::new(rows, vec![Constraint::Length(5); 2]);
-            Widget::render(table, Rect::new(0, 0, 0, 0), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 0, 0), &mut buf);
             assert_eq!(buf, Buffer::empty(Rect::new(0, 0, 15, 3)));
         }
 
@@ -1013,7 +991,7 @@ mod tests {
         fn render_default() {
             let mut buf = Buffer::empty(Rect::new(0, 0, 15, 3));
             let table = Table::default();
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             assert_eq!(buf, Buffer::empty(Rect::new(0, 0, 15, 3)));
         }
 
@@ -1026,7 +1004,7 @@ mod tests {
             ];
             let block = Block::bordered().title("Block");
             let table = Table::new(rows, vec![Constraint::Length(5); 2]).block(block);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "┌Block────────┐",
@@ -1045,7 +1023,7 @@ mod tests {
                 Row::new(vec!["Cell3", "Cell4"]),
             ];
             let table = Table::new(rows, [Constraint::Length(5); 2]).header(header);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "Head1 Head2    ",
@@ -1064,7 +1042,7 @@ mod tests {
                 Row::new(vec!["Cell3", "Cell4"]),
             ];
             let table = Table::new(rows, [Constraint::Length(5); 2]).footer(footer);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "Cell1 Cell2    ",
@@ -1083,7 +1061,7 @@ mod tests {
             let table = Table::new(rows, [Constraint::Length(5); 2])
                 .header(header)
                 .footer(footer);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "Head1 Head2    ",
@@ -1102,7 +1080,7 @@ mod tests {
                 Row::new(vec!["Cell3", "Cell4"]),
             ];
             let table = Table::new(rows, [Constraint::Length(5); 2]).header(header);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "Head1 Head2    ",
@@ -1118,7 +1096,7 @@ mod tests {
             let footer = Row::new(vec!["Foot1", "Foot2"]).top_margin(1);
             let rows = vec![Row::new(vec!["Cell1", "Cell2"])];
             let table = Table::new(rows, [Constraint::Length(5); 2]).footer(footer);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "Cell1 Cell2    ",
@@ -1136,7 +1114,7 @@ mod tests {
                 Row::new(vec!["Cell3", "Cell4"]),
             ];
             let table = Table::new(rows, [Constraint::Length(5); 2]);
-            Widget::render(table, Rect::new(0, 0, 15, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
                 "Cell1 Cell2    ",
@@ -1155,7 +1133,7 @@ mod tests {
                 Row::new(vec![Line::from("Right").alignment(Alignment::Right)]),
             ];
             let table = Table::new(rows, [Percentage(100)]);
-            Widget::render(table, Rect::new(0, 0, 10, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 10, 3), &mut buf);
             let expected = Buffer::with_lines(["Left      ", "  Center  ", "     Right"]);
             assert_eq!(buf, expected);
         }
@@ -1166,7 +1144,7 @@ mod tests {
             let table = Table::new(Vec::<Row>::new(), [Constraint::Min(20); 1])
                 .header(Row::new([Line::from("").alignment(Alignment::Right)]))
                 .footer(Row::new([Line::from("").alignment(Alignment::Right)]));
-            Widget::render(table, Rect::new(0, 0, 20, 3), &mut buf);
+            table.render_without_state(Rect::new(0, 0, 20, 3), &mut buf);
         }
 
         #[test]
@@ -1179,8 +1157,7 @@ mod tests {
             let table = Table::new(rows, [Constraint::Length(5); 2])
                 .highlight_style(Style::new().red())
                 .highlight_symbol(">>");
-            let mut state = TableState::new().with_selected(0);
-            StatefulWidget::render(table, Rect::new(0, 0, 15, 3), &mut buf, &mut state);
+            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
             let expected = Buffer::with_lines([
                 ">>Cell1 Cell2  ".red(),
                 "  Cell3 Cell4  ".into(),
@@ -1405,7 +1382,7 @@ mod tests {
             let area = Rect::new(0, 0, columns, 3);
             let mut buf = Buffer::empty(area);
             let mut state = TableState::default().with_selected(selection);
-            StatefulWidget::render(table, area, &mut buf, &mut state);
+            table.render(area, &mut buf, &mut state);
             assert_eq!(buf, Buffer::with_lines(expected));
         }
 
@@ -1432,7 +1409,7 @@ mod tests {
                 .column_spacing(0);
             let area = Rect::new(0, 0, 15, 3);
             let mut buf = Buffer::empty(area);
-            Widget::render(table, area, &mut buf);
+            table.render_without_state(area, &mut buf);
             let expected = Buffer::with_lines([
                 "ABCDE12345     ", /* As reference, this is what happens when you manually
                                     * specify widths */
@@ -1596,7 +1573,7 @@ mod tests {
                 .column_spacing(1);
             let area = Rect::new(0, 0, 10, 3);
             let mut buf = Buffer::empty(area);
-            Widget::render(table, area, &mut buf);
+            table.render_without_state(area, &mut buf);
             // highlight_symbol and spacing are prioritized but columns are evenly distributed
             #[rustfmt::skip]
             let expected = Buffer::with_lines([
@@ -1614,7 +1591,7 @@ mod tests {
                 .column_spacing(1);
             let area = Rect::new(0, 0, 10, 3);
             let mut buf = Buffer::empty(area);
-            Widget::render(table, area, &mut buf);
+            table.render_without_state(area, &mut buf);
             // highlight_symbol and spacing are prioritized but columns are evenly distributed
             #[rustfmt::skip]
             let expected = Buffer::with_lines([

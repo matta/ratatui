@@ -291,7 +291,7 @@ fn draw_second_tab(f: &mut Frame, app: &mut App, area: Rect) {
             .bottom_margin(1),
     )
     .block(Block::bordered().title("Servers"));
-    Widget::render(table, chunks[0], f.buffer_mut());
+    table.render_without_state(chunks[0], f.buffer_mut());
 
     let map = Canvas::default()
         .block(Block::bordered().title("World"))
@@ -389,5 +389,5 @@ fn draw_third_tab(f: &mut Frame, _app: &mut App, area: Rect) {
         ],
     )
     .block(Block::bordered().title("Colors"));
-    Widget::render(table, chunks[0], f.buffer_mut());
+    table.render_without_state(chunks[0], f.buffer_mut());
 }

@@ -284,7 +284,7 @@ fn render_table(f: &mut Frame, app: &mut App, area: Rect) {
     ]))
     .bg(app.colors.buffer_bg)
     .highlight_spacing(HighlightSpacing::Always);
-    StatefulWidget::render(t, area, f.buffer_mut(), &mut app.state);
+    t.render(area, f.buffer_mut(), &mut app.state);
 }
 
 fn constraint_len_calculator(items: &[Data]) -> (u16, u16, u16) {
