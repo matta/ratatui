@@ -884,41 +884,8 @@ impl<'a> List<'a> {
 
         (first_visible_index, last_visible_index)
     }
-}
 
-impl Widget for List<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        WidgetRef::render_ref(&self, area, buf);
-    }
-}
-
-impl WidgetRef for List<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let mut state = ListState::default();
-        StatefulWidgetRef::render_ref(self, area, buf, &mut state);
-    }
-}
-
-impl StatefulWidget for List<'_> {
-    type State = ListState;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        StatefulWidgetRef::render_ref(&self, area, buf, state);
-    }
-}
-
-// Note: remove this when StatefulWidgetRef is stabilized and replace with the blanket impl
-impl StatefulWidget for &List<'_> {
-    type State = ListState;
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        StatefulWidgetRef::render_ref(self, area, buf, state);
-    }
-}
-
-impl StatefulWidgetRef for List<'_> {
-    type State = ListState;
-
-    fn render_ref(&self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+    fn render_ref(&self, area: Rect, buf: &mut Buffer, state: &mut ListState) {
         buf.set_style(area, self.style);
         if let Some(ref block) = self.block {
             block.render_ref(area, buf);
@@ -1007,6 +974,35 @@ impl StatefulWidgetRef for List<'_> {
                 buf.set_style(row_area, self.highlight_style);
             }
         }
+    }
+}
+
+impl Widget for List<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        WidgetRef::render_ref(&self, area, buf);
+    }
+}
+
+impl WidgetRef for List<'_> {
+    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+        let mut state = ListState::default();
+        self.render_ref(area, buf, &mut state);
+    }
+}
+
+impl StatefulWidget for List<'_> {
+    type State = ListState;
+
+    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+        self.render_ref(area, buf, state);
+    }
+}
+
+// Note: remove this when StatefulWidgetRef is stabilized and replace with the blanket impl
+impl StatefulWidget for &List<'_> {
+    type State = ListState;
+    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+        self.render_ref(area, buf, state);
     }
 }
 
