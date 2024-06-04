@@ -5,7 +5,7 @@ use ratatui::{
     style::{Color, Style},
     symbols,
     text::{self, Span},
-    widgets::{Axis, Block, Chart, Dataset, GraphType::Line, Widget},
+    widgets::{Axis, Block, Chart, Dataset, GraphType::Line},
     Terminal,
 };
 use rstest::rstest;

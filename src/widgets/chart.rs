@@ -934,17 +934,10 @@ impl<'a> Chart<'a> {
             }
         }
     }
-}
 
-impl Widget for Chart<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Chart<'_> {
+    /// FIXME: writeme
     #[allow(clippy::too_many_lines)]
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
 
         if let Some(ref block) = self.block {
