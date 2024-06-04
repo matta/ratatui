@@ -235,6 +235,16 @@ impl<'a> Tabs<'a> {
         self.padding_left = padding.into();
         self
     }
+
+    /// FIXME: writeme
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
+        buf.set_style(area, self.style);
+        if let Some(ref block) = self.block {
+            block.render(area, buf);
+        }
+        let inner = self.block.inner_if_some(area);
+        self.render_tabs(inner, buf);
+    }
 }
 
 impl<'a> Styled for Tabs<'a> {
@@ -246,23 +256,6 @@ impl<'a> Styled for Tabs<'a> {
 
     fn set_style<S: Into<Style>>(self, style: S) -> Self::Item {
         self.style(style)
-    }
-}
-
-impl Widget for Tabs<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Tabs<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        buf.set_style(area, self.style);
-        if let Some(ref block) = self.block {
-            block.render(area, buf);
-        }
-        let inner = self.block.inner_if_some(area);
-        self.render_tabs(inner, buf);
     }
 }
 
@@ -381,7 +374,7 @@ mod tests {
     }
 
     #[track_caller]
-    fn test_case(tabs: Tabs, area: Rect, expected: &Buffer) {
+    fn test_case(tabs: &Tabs, area: Rect, expected: &Buffer) {
         let mut buffer = Buffer::empty(area);
         tabs.render(area, &mut buffer);
         assert_eq!(&buffer, expected);
@@ -393,7 +386,7 @@ mod tests {
         let mut expected = Buffer::with_lines([" Tab1 │ Tab2 │ Tab3 │ Tab4    "]);
         // first tab selected
         expected.set_style(Rect::new(1, 0, 4, 1), DEFAULT_HIGHLIGHT_STYLE);
-        test_case(tabs, Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]
@@ -402,7 +395,7 @@ mod tests {
         let mut expected = Buffer::with_lines(["Tab1│Tab2│Tab3│Tab4           "]);
         // first tab selected
         expected.set_style(Rect::new(0, 0, 4, 1), DEFAULT_HIGHLIGHT_STYLE);
-        test_case(tabs, Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]
@@ -411,7 +404,7 @@ mod tests {
         let mut expected = Buffer::with_lines(["---Tab1++│---Tab2++│---Tab3++│"]);
         // first tab selected
         expected.set_style(Rect::new(3, 0, 4, 1), DEFAULT_HIGHLIGHT_STYLE);
-        test_case(tabs, Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]
@@ -425,7 +418,7 @@ mod tests {
         ]);
         // first tab selected
         expected.set_style(Rect::new(2, 1, 4, 1), DEFAULT_HIGHLIGHT_STYLE);
-        test_case(tabs, Rect::new(0, 0, 30, 3), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 3), &expected);
     }
 
     #[test]
@@ -434,7 +427,7 @@ mod tests {
             Tabs::new(vec!["Tab1", "Tab2", "Tab3", "Tab4"]).style(Style::default().fg(Color::Red));
         let mut expected = Buffer::with_lines([" Tab1 │ Tab2 │ Tab3 │ Tab4    ".red()]);
         expected.set_style(Rect::new(1, 0, 4, 1), DEFAULT_HIGHLIGHT_STYLE.red());
-        test_case(tabs, Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]
@@ -447,7 +440,7 @@ mod tests {
             "Tab1".reversed(),
             " │ Tab2 │ Tab3 │ Tab4    ".into(),
         ])]);
-        test_case(tabs.clone().select(0), Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs.clone().select(0), Rect::new(0, 0, 30, 1), &expected);
 
         // second tab selected
         let expected = Buffer::with_lines([Line::from(vec![
@@ -455,7 +448,7 @@ mod tests {
             "Tab2".reversed(),
             " │ Tab3 │ Tab4    ".into(),
         ])]);
-        test_case(tabs.clone().select(1), Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs.clone().select(1), Rect::new(0, 0, 30, 1), &expected);
 
         // last tab selected
         let expected = Buffer::with_lines([Line::from(vec![
@@ -463,11 +456,11 @@ mod tests {
             "Tab4".reversed(),
             "    ".into(),
         ])]);
-        test_case(tabs.clone().select(3), Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs.clone().select(3), Rect::new(0, 0, 30, 1), &expected);
 
         // out of bounds selects no tab
         let expected = Buffer::with_lines([" Tab1 │ Tab2 │ Tab3 │ Tab4    "]);
-        test_case(tabs.clone().select(4), Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs.clone().select(4), Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]
@@ -481,7 +474,7 @@ mod tests {
             "Tab1".red().underlined(),
             " │ Tab2 │ Tab3 │ Tab4    ".red(),
         ])]);
-        test_case(tabs, Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]
@@ -490,7 +483,7 @@ mod tests {
         let mut expected = Buffer::with_lines([" Tab1 -- Tab2 -- Tab3 -- Tab4 "]);
         // first tab selected
         expected.set_style(Rect::new(1, 0, 4, 1), DEFAULT_HIGHLIGHT_STYLE);
-        test_case(tabs, Rect::new(0, 0, 30, 1), &expected);
+        test_case(&tabs, Rect::new(0, 0, 30, 1), &expected);
     }
 
     #[test]

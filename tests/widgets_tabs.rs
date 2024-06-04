@@ -4,7 +4,7 @@ use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
     symbols,
-    widgets::{Tabs, Widget},
+    widgets::Tabs,
     Terminal,
 };
 
@@ -15,8 +15,7 @@ fn widgets_tabs_should_not_panic_on_narrow_areas() {
     terminal
         .draw(|f| {
             let tabs = Tabs::new(["Tab1", "Tab2"]);
-            Widget::render(
-                tabs,
+            tabs.render(
                 Rect {
                     x: 0,
                     y: 0,
@@ -37,8 +36,7 @@ fn widgets_tabs_should_truncate_the_last_item() {
     terminal
         .draw(|f| {
             let tabs = Tabs::new(["Tab1", "Tab2"]);
-            Widget::render(
-                tabs,
+            tabs.render(
                 Rect {
                     x: 0,
                     y: 0,

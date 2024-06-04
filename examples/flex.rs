@@ -270,7 +270,7 @@ impl Widget for App {
 }
 
 impl App {
-    fn tabs(self) -> impl Widget {
+    fn tabs(self) -> Tabs<'static> {
         let tab_titles = SelectedTab::iter().map(SelectedTab::to_tab_title);
         let block = Block::new()
             .title(Title::from("Flex Layouts ".bold()))
