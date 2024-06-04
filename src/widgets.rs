@@ -191,48 +191,8 @@ impl<W: WidgetRef> Widget for &W {
 }
 
 /// Renders a string slice as a widget.
-///
-/// This implementation allows a string slice (`&str`) to act as a widget, meaning it can be drawn
-/// onto a [`Buffer`] in a specified [`Rect`]. The slice represents a static string which can be
-/// rendered by reference, thereby avoiding the need for string cloning or ownership transfer when
-/// drawing the text to the screen.
-impl Widget for &str {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-/// Provides the ability to render a string slice by reference.
-///
-/// This trait implementation ensures that a string slice, which is an immutable view over a
-/// `String`, can be drawn on demand without requiring ownership of the string itself. It utilizes
-/// the default text style when rendering onto the provided [`Buffer`] at the position defined by
-/// [`Rect`].
-impl WidgetRef for &str {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        buf.set_string(area.x, area.y, self, crate::style::Style::default());
-    }
-}
-
-/// Renders a `String` object as a widget.
-///
-/// This implementation enables an owned `String` to be treated as a widget, which can be rendered
-/// on a [`Buffer`] within the bounds of a given [`Rect`].
-impl Widget for String {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-/// Provides the ability to render a `String` by reference.
-///
-/// This trait allows for a `String` to be rendered onto the [`Buffer`], similarly using the default
-/// style settings. It ensures that an owned `String` can be rendered efficiently by reference,
-/// without the need to give up ownership of the underlying text.
-impl WidgetRef for String {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        buf.set_string(area.x, area.y, self, crate::style::Style::default());
-    }
+pub fn render_str(s: &str, area: Rect, buf: &mut Buffer) {
+    buf.set_string(area.x, area.y, s, crate::style::Style::default());
 }
 
 #[cfg(test)]
@@ -327,28 +287,17 @@ mod tests {
 
         #[rstest]
         fn render(mut buf: Buffer) {
-            "hello world".render(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["hello world         "]));
-        }
-
-        #[rstest]
-        fn render_ref(mut buf: Buffer) {
-            "hello world".render_ref(buf.area, &mut buf);
+            render_str("hello world", buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines(["hello world         "]));
         }
     }
 
     mod string {
         use super::*;
-        #[rstest]
-        fn render(mut buf: Buffer) {
-            String::from("hello world").render(buf.area, &mut buf);
-            assert_eq!(buf, Buffer::with_lines(["hello world         "]));
-        }
 
         #[rstest]
-        fn render_ref(mut buf: Buffer) {
-            String::from("hello world").render_ref(buf.area, &mut buf);
+        fn render(mut buf: Buffer) {
+            render_str(&String::from("hello world"), buf.area, &mut buf);
             assert_eq!(buf, Buffer::with_lines(["hello world         "]));
         }
     }
