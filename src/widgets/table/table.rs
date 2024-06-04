@@ -1157,7 +1157,8 @@ mod tests {
             let table = Table::new(rows, [Constraint::Length(5); 2])
                 .highlight_style(Style::new().red())
                 .highlight_symbol(">>");
-            table.render_without_state(Rect::new(0, 0, 15, 3), &mut buf);
+            let mut state = TableState::new().with_selected(0);
+            table.render(Rect::new(0, 0, 15, 3), &mut buf, &mut state);
             let expected = Buffer::with_lines([
                 ">>Cell1 Cell2  ".red(),
                 "  Cell3 Cell4  ".into(),
