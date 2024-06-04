@@ -171,6 +171,7 @@ harness = false
 
 [lib]
 bench = false
+doctest = false
 
 [[bench]]
 name = "paragraph"
