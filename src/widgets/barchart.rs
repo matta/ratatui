@@ -573,16 +573,9 @@ impl BarChart<'_> {
             bar_x += self.group_gap;
         }
     }
-}
 
-impl Widget for BarChart<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for BarChart<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// TODO: write docs.
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
 
         if let Some(ref block) = self.block {

@@ -4,7 +4,7 @@ use ratatui::{
     buffer::Buffer,
     layout::Rect,
     prelude::Direction,
-    widgets::{Bar, BarChart, BarGroup, Widget},
+    widgets::{Bar, BarChart, BarGroup},
 };
 
 /// Benchmark for rendering a barchart.

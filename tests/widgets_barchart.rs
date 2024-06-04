@@ -2,7 +2,7 @@ use ratatui::{
     backend::TestBackend,
     buffer::Buffer,
     style::{Color, Style},
-    widgets::{Bar, BarChart, BarGroup, Block, Widget},
+    widgets::{Bar, BarChart, BarGroup, Block},
     Terminal,
 };
 
