@@ -54,10 +54,8 @@ impl EmailTab {
     pub fn next(&mut self) {
         self.row_index = self.row_index.saturating_add(1) % EMAILS.len();
     }
-}
 
-impl Widget for EmailTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    pub fn render(self, area: Rect, buf: &mut Buffer) {
         RgbSwatch.render(area, buf);
         let area = area.inner(&Margin {
             vertical: 1,

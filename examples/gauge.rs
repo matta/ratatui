@@ -118,9 +118,7 @@ impl App {
     fn quit(&mut self) {
         self.state = AppState::Quitting;
     }
-}
 
-impl Widget for &App {
     #[allow(clippy::similar_names)]
     fn render(self, area: Rect, buf: &mut Buffer) {
         use Constraint::*;

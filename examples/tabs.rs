@@ -118,8 +118,8 @@ impl SelectedTab {
     }
 }
 
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+impl App {
+    fn render(&self, area: Rect, buf: &mut Buffer) {
         use Constraint::*;
         let vertical = Layout::vertical([Length(1), Min(0), Length(1)]);
         let [header_area, inner_area, footer_area] = vertical.areas(area);
@@ -132,9 +132,7 @@ impl Widget for &App {
         self.selected_tab.render(inner_area, buf);
         render_footer(footer_area, buf);
     }
-}
 
-impl App {
     fn render_tabs(&self, area: Rect, buf: &mut Buffer) {
         let titles = SelectedTab::iter().map(SelectedTab::title);
         let highlight_style = (Color::default(), self.selected_tab.palette().c700);
@@ -156,18 +154,6 @@ fn render_footer(area: Rect, buf: &mut Buffer) {
     Line::raw("◄ ► to change tab | Press q to quit")
         .centered()
         .render(area, buf);
-}
-
-impl Widget for SelectedTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        // in a real app these might be separate widgets
-        match self {
-            Self::Tab1 => self.render_tab0(area, buf),
-            Self::Tab2 => self.render_tab1(area, buf),
-            Self::Tab3 => self.render_tab2(area, buf),
-            Self::Tab4 => self.render_tab3(area, buf),
-        }
-    }
 }
 
 impl SelectedTab {
@@ -217,6 +203,16 @@ impl SelectedTab {
             Self::Tab2 => tailwind::EMERALD,
             Self::Tab3 => tailwind::INDIGO,
             Self::Tab4 => tailwind::RED,
+        }
+    }
+
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        // in a real app these might be separate widgets
+        match self {
+            Self::Tab1 => self.render_tab0(area, buf),
+            Self::Tab2 => self.render_tab1(area, buf),
+            Self::Tab3 => self.render_tab2(area, buf),
+            Self::Tab4 => self.render_tab3(area, buf),
         }
     }
 }

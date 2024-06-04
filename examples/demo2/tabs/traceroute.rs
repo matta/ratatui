@@ -21,10 +21,8 @@ impl TracerouteTab {
     pub fn next_row(&mut self) {
         self.row_index = self.row_index.saturating_add(1) % HOPS.len();
     }
-}
 
-impl Widget for TracerouteTab {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    pub fn render(self, area: Rect, buf: &mut Buffer) {
         RgbSwatch.render(area, buf);
         let area = area.inner(&Margin {
             vertical: 1,

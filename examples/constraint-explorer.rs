@@ -255,25 +255,6 @@ impl From<Constraint> for ConstraintName {
     }
 }
 
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let [header_area, instructions_area, swap_legend_area, _, blocks_area] =
-            Layout::vertical([
-                Length(2), // header
-                Length(2), // instructions
-                Length(1), // swap key legend
-                Length(1), // gap
-                Fill(1),   // blocks
-            ])
-            .areas(area);
-
-        App::header().render(header_area, buf);
-        App::instructions().render(instructions_area, buf);
-        App::swap_legend().render(swap_legend_area, buf);
-        self.render_layout_blocks(blocks_area, buf);
-    }
-}
-
 // App rendering
 impl App {
     const HEADER_COLOR: Color = SLATE.c200;
@@ -387,18 +368,25 @@ impl App {
         }
 
         for area in spacers.iter() {
-            SpacerBlock.render(*area, buf);
+            SpacerBlock::render(*area, buf);
         }
     }
-}
 
-impl Widget for ConstraintBlock {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        match area.height {
-            1 => self.render_1px(area, buf),
-            2 => self.render_2px(area, buf),
-            _ => self.render_4px(area, buf),
-        }
+    fn render(&self, area: Rect, buf: &mut Buffer) {
+        let [header_area, instructions_area, swap_legend_area, _, blocks_area] =
+            Layout::vertical([
+                Length(2), // header
+                Length(2), // instructions
+                Length(1), // swap key legend
+                Length(1), // gap
+                Fill(1),   // blocks
+            ])
+            .areas(area);
+
+        Self::header().render(header_area, buf);
+        Self::instructions().render(instructions_area, buf);
+        Self::swap_legend().render(swap_legend_area, buf);
+        self.render_layout_blocks(blocks_area, buf);
     }
 }
 
@@ -493,15 +481,12 @@ impl ConstraintBlock {
             }
         }
     }
-}
 
-impl Widget for SpacerBlock {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn render(&self, area: Rect, buf: &mut Buffer) {
         match area.height {
-            1 => (),
-            2 => Self::render_2px(area, buf),
-            3 => Self::render_3px(area, buf),
-            _ => Self::render_4px(area, buf),
+            1 => self.render_1px(area, buf),
+            2 => self.render_2px(area, buf),
+            _ => self.render_4px(area, buf),
         }
     }
 }
@@ -589,6 +574,15 @@ impl SpacerBlock {
 
         let row = area.rows().nth(2).unwrap_or_default();
         Self::label(area.width).render(row, buf);
+    }
+
+    fn render(area: Rect, buf: &mut Buffer) {
+        match area.height {
+            1 => (),
+            2 => Self::render_2px(area, buf),
+            3 => Self::render_3px(area, buf),
+            _ => Self::render_4px(area, buf),
+        }
     }
 }
 

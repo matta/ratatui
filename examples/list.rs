@@ -174,28 +174,6 @@ impl App {
     }
 }
 
-impl Widget for &mut App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        // Create a space for header, todo list and the footer.
-        let vertical = Layout::vertical([
-            Constraint::Length(2),
-            Constraint::Min(0),
-            Constraint::Length(2),
-        ]);
-        let [header_area, rest_area, footer_area] = vertical.areas(area);
-
-        // Create two chunks with equal vertical screen space. One for the list and the other for
-        // the info block.
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let [upper_item_list_area, lower_item_list_area] = vertical.areas(rest_area);
-
-        render_title(header_area, buf);
-        self.render_todo(upper_item_list_area, buf);
-        self.render_info(lower_item_list_area, buf);
-        render_footer(footer_area, buf);
-    }
-}
-
 impl App {
     fn render_todo(&mut self, area: Rect, buf: &mut Buffer) {
         // We create two blocks, one is for the header (outer) and the other is for list (inner).
@@ -282,6 +260,26 @@ impl App {
 
         // We can now render the item info
         info_paragraph.render(inner_info_area, buf);
+    }
+
+    fn render(&mut self, area: Rect, buf: &mut Buffer) {
+        // Create a space for header, todo list and the footer.
+        let vertical = Layout::vertical([
+            Constraint::Length(2),
+            Constraint::Min(0),
+            Constraint::Length(2),
+        ]);
+        let [header_area, rest_area, footer_area] = vertical.areas(area);
+
+        // Create two chunks with equal vertical screen space. One for the list and the other for
+        // the info block.
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+        let [upper_item_list_area, lower_item_list_area] = vertical.areas(rest_area);
+
+        render_title(header_area, buf);
+        self.render_todo(upper_item_list_area, buf);
+        self.render_info(lower_item_list_area, buf);
+        render_footer(footer_area, buf);
     }
 }
 
