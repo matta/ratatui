@@ -152,16 +152,9 @@ impl<'a> Gauge<'a> {
         self.use_unicode = unicode;
         self
     }
-}
 
-impl Widget for Gauge<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for Gauge<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// FIXME: write me
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
         if let Some(ref block) = self.block {
             block.render(area, buf);
@@ -350,16 +343,9 @@ impl<'a> LineGauge<'a> {
         self.gauge_style = style.into();
         self
     }
-}
 
-impl Widget for LineGauge<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_ref(area, buf);
-    }
-}
-
-impl WidgetRef for LineGauge<'_> {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
+    /// FIXME: write me
+    pub fn render(&self, area: Rect, buf: &mut Buffer) {
         buf.set_style(area, self.style);
         if let Some(ref block) = self.block {
             block.render(area, buf);

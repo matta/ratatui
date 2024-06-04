@@ -5,7 +5,7 @@ use ratatui::{
     style::{Color, Modifier, Style, Stylize},
     symbols,
     text::Span,
-    widgets::{Block, Gauge, LineGauge, Widget},
+    widgets::{Block, Gauge, LineGauge},
     Terminal,
 };
 
